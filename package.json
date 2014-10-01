@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/franklingu/Visual-IDE",
   "dependencies": {
-    "googleapis": "^1.0.14"
+    "googleapis": "^1.0.14",
+    "mongoose": "^3.8.17"
   }
 }
