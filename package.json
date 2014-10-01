@@ -1,0 +1,28 @@
+{
+  "name": "Visual-IDE",
+  "version": "0.0.1",
+  "description": "Visual IDE built on JS",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/franklingu/Visual-IDE.git"
+  },
+  "keywords": [
+    "Visual-IDE",
+    "JavaScript",
+    "node",
+    "oauth2"
+  ],
+  "author": "franklingu, Thygesh, Bharath",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/franklingu/Visual-IDE/issues"
+  },
+  "homepage": "https://github.com/franklingu/Visual-IDE",
+  "dependencies": {
+    "googleapis": "^1.0.14"
+  }
+}
