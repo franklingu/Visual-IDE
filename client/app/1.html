@@ -9,30 +9,6 @@
   <script src="../lib/js/jquery-1.10.2.js"></script>
   <script src="../lib/js/jquery-ui.min.js"></script>
   <script type="text/javascript" src="js/app.js"></script>
-
-  <script>
-  $(function() {
-    $( "#sortable1" ).sortable({
-	    connectWith: ".connectedSortable",
-	    forcePlaceholderSize: false,
-	    helper: function(e,li) {
-	        copyHelper= li.clone().insertAfter(li);
-	        return li.clone();
-	    },
-	    stop: function() {
-	        copyHelper && copyHelper.remove();
-	    },
-	    placeholder: "place-holder"
-
-	});
-    $(".connectedSortable").sortable({
-        receive: function(e,ui) {
-            copyHelper= null;
-        }
-	});	
-
-  });
-  </script>
 </head>
 <body>
  
@@ -49,6 +25,9 @@
  
 <ul id="sortable2" class="connectedSortable">
 </ul>
+
+<div id="feedbackArea" class="feedbackArea">
+</div>
  
  
 </body>
