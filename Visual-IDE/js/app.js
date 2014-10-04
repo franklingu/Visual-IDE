@@ -21,6 +21,11 @@ $(function () {
     });
 
     $('#getJson').on('click', function () {
+        var obj = getSequenceJson();
+        $('#feedback-area').html(JSON.stringify(obj));
+    });
+
+    var getSequenceJson = function () {
         var commands = $('#sortable2').find("li");
         var json = [];
         commands.each(function(index) {
@@ -35,7 +40,16 @@ $(function () {
         });
         var obj = {};
         obj['data'] = json;
-        $('#feedback-area').html(JSON.stringify(obj));
-    });
+        return obj;
+    }
+
+    $('#saveJson').on('click', function () {
+        var obj = getSequenceJson();
+        obj['title'] = 'default-title';
+        var request = $.ajax({url: '/save/', type: 'POST', data: obj, dataType: 'json'});
+        request.done(function (res) {
+            console.log(res['status']);
+        });
+    })
 });
 

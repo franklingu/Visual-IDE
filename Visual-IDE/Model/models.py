@@ -18,15 +18,17 @@ class DbManager(object):
         return query_results
 
     @classmethod
-    def save_project(self, project):
-        assert project
-        query_results = db.GqlQuery("SELECT * FROM SavedProject WHERE user_email = :1 AND project_name = :2",
-                                    project.user_email, project.project_name)
-        if query_results:
-            query_results[0].project_content = project.project_content
-            query_results[0].created_at = project.created_at
-            query_results[0].put()
+    def save_project(self, user_email, project_name, project_content):
+        query_result = db.GqlQuery("SELECT * FROM SavedProject WHERE user_email = :1 AND project_name = :2",
+                                   user_email, project_name).get()
+        if query_result:
+            query_result.project_content = project_content
+            query_result.put()
         else:
+            project = SavedProject()
+            project.user_email = user_email
+            project.project_name = project_name
+            project.project_content = project_content
             project.put()
 
     @classmethod

@@ -2,7 +2,10 @@ import webapp2
 import jinja2
 import os
 import json
+import re
+import logging
 from google.appengine.api import users
+from Model.models import DbManager
 from util.sessions import Session
 
 jinja_environment = jinja2.Environment(
@@ -57,24 +60,47 @@ class IndexHandler(BaseHanlder):
 class SaveProjectHandler(BaseHanlder):
     def post(self):
         if self.set_user_if_loggedin():
-            self.render_json({'status': 'loggedin'})
+            email = self.user.email()
+            dic = self.convert_multi_dict_to_dict(self.request.POST)
+            title = dic.get('project_title')
+            content = json.dumps(dic.get('project_content'))
+            DbManager.save_project(email, title, content)
+            self.render_json({'status': 'Project saved'})
         else:
             self.session['project_name'] = 'haha'
             self.session['project_content'] = 'this is test'
-            self.render_json({'status': 'loggedout'})
+            self.render_json({'status': 'Please login first'})
+
+    def convert_multi_dict_to_dict(self, multi_dic):
+        dic = {}
+        title = None
+        data = []
+        for key in multi_dic.keys():
+            match_data = re.match(r'^data\[(\d+)\]\[([a-z]+)\]', key)
+            if match_data and match_data.group(2) == 'title':
+                data.append({})
+        for item in multi_dic.keys():
+            match_data = re.match(r'^data\[(\d+)\]\[([a-z]+)\]', item)
+            if match_data:
+                data[int(match_data.group(1))][match_data.group(2)] = multi_dic[item]
+            else:
+                title = multi_dic[item]
+        dic['project_title'] = title
+        dic['project_content'] = data
+        return dic
 
 
 class LoadProjecthandler(BaseHanlder):
     def get(self):
         if self.set_user_if_loggedin():
-            self.render_json({'status': 'loggedin'})
+            self.render_json({'status': 'Project loaded'})
         else:
             self.session['project_name'] = 'haha'
             self.session['project_content'] = 'this is test'
-            self.render_json({'status': 'loggedout'})
+            self.render_json({'status': 'Nothing to load'})
 
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),
-    ('/save', SaveProjectHandler),
-    ('/load', LoadProjecthandler)
+    ('/save/', SaveProjectHandler),
+    ('/load/', LoadProjecthandler)
 ], debug=True)
