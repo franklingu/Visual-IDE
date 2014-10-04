@@ -30,4 +30,5 @@ node_modules
 # ignore data folder
 data
 
-
+# ignore python compiled
+*pyc
