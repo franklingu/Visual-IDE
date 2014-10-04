@@ -1,0 +1,50 @@
+
+#sortable1, #sortable2 {
+  border: 1px solid #eee;
+  width: 142px;
+  min-height: 20px;
+  list-style-type: none;
+  margin: 0;
+  padding: 5px 0 0 0;
+  float: left;
+  margin-right: 10px;
+}
+
+#sortable2 {
+  height: 400px;
+  min-height: 400px;
+  width: 500px;
+}
+
+#sortable1 li, #sortable2 li {
+  margin: 0 5px 5px 5px;
+  padding: 5px;
+  font-size: 1.2em;
+  width: 120px;
+}
+
+#sortable1 > .place-holder {
+	display: none;
+}
+
+.remove-command {
+  cursor: pointer;
+  color: black;
+  font-size: 14px;
+}
+
+  .remove-command:active {
+    font-size: 13px;
+    color: red;
+  }
+
+.feedbackArea{
+   border: 1px solid #eee;
+  width: 142px;
+  min-height: 20px;
+  list-style-type: none;
+  margin: 0;
+  padding: 5px 0 0 0;
+  float: left;
+  margin-right: 10px;
+}
