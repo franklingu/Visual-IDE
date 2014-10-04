@@ -24,13 +24,30 @@
     font-size: 1.2em;
     width: 120px;
   }
+  #sortable1 > .place-holder {
+  	display: none;
+  }
   </style>
   <script>
   $(function() {
-    $( "#sortable1, #sortable2" ).sortable({
-      connectWith: ".connectedSortable",
-      helper: "clone"
-    });
+    $( "#sortable1" ).sortable({
+	    connectWith: ".connectedSortable",
+	    forcePlaceholderSize: false,
+	    helper: function(e,li) {
+	        copyHelper= li.clone().insertAfter(li);
+	        return li.clone();
+	    },
+	    stop: function() {
+	        copyHelper && copyHelper.remove();
+	    },
+	    placeholder: "place-holder"
+
+	});
+    $(".connectedSortable").sortable({
+        receive: function(e,ui) {
+            copyHelper= null;
+        }
+	});
 
   });
   </script>
