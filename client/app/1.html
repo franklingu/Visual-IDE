@@ -27,27 +27,57 @@
   #sortable1 > .place-holder {
   	display: none;
   }
+
+  .feedbackArea{
+     border: 1px solid #eee;
+    width: 142px;
+    min-height: 20px;
+    list-style-type: none;
+    margin: 0;
+    padding: 5px 0 0 0;
+    float: left;
+    margin-right: 10px;
+
+  }
   </style>
   <script>
   $(function() {
-    $( "#sortable1" ).sortable({
-	    connectWith: ".connectedSortable",
+    $( "#sortable1" ).find("li").draggable({
+	    connectToSortable: ".connectedSortable",
 	    forcePlaceholderSize: false,
-	    helper: function(e,li) {
+      helper: "clone"
+	   /* helper: function(e,li) {
 	        copyHelper= li.clone().insertAfter(li);
 	        return li.clone();
 	    },
 	    stop: function() {
 	        copyHelper && copyHelper.remove();
 	    },
-	    placeholder: "place-holder"
+	    placeholder: "place-holder"*/
 
 	});
     $(".connectedSortable").sortable({
         receive: function(e,ui) {
             copyHelper= null;
-        }
-	});
+        },
+
+        update: function(e, ui){
+            $("#feedbackArea").html("");
+            var lists = $("#sortable2").find("li");
+            for(var i=0;i<lists.length;i++){
+            $("#feedbackArea").append($(lists[i]).html());
+            }
+          }
+
+    });
+
+
+
+
+    var lists = $("#sortable2").find("li");
+    for(var i=0;i<lists.length;i++){
+      $("#feedbackArea").append($(lists[i]).html());
+    }
 
   });
   </script>
@@ -69,6 +99,9 @@
   <li class="ui-state-highlight">Item 4</li>
   <li class="ui-state-highlight">Item 5</li>
 </ul>
+
+<div id="feedbackArea" class="feedbackArea">
+</div>
  
  
 </body>
