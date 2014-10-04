@@ -49,6 +49,12 @@ $(function () {
         var request = $.ajax({url: '/save/', type: 'POST', data: obj, dataType: 'json'});
         request.done(function (res) {
             console.log(res['status']);
+            if (res['status'] === 'Please login first') {
+                $.cookie("obj", JSON.stringify(obj));
+            }
+        });
+        request.fail(function () {
+            $.cookie("obj", JSON.stringify(obj));
         });
     });
 
@@ -59,6 +65,8 @@ $(function () {
             console.log(res['status']);
             console.log(res['project_title']);
             console.log(res['project_content']);
+            var objStr = $.cookie("obj");
+            console.log(JSON.parse(objStr));
         });
     });
 });

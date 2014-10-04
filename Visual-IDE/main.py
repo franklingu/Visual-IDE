@@ -6,7 +6,7 @@ import re
 import logging
 from google.appengine.api import users
 from Model.models import DbManager
-from util.sessions import Session
+from gaesessions import get_current_session
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__) + "/templates"))
@@ -14,7 +14,7 @@ jinja_environment = jinja2.Environment(
 
 class BaseHanlder(webapp2.RequestHandler):
     def dispatch(self):
-        self.session = Session()
+        self.session = get_current_session()
         super(BaseHanlder, self).dispatch()
 
     def set_user_if_loggedin(self):
@@ -90,14 +90,28 @@ class LoadProjecthandler(BaseHanlder):
     def get(self):
         if self.set_user_if_loggedin():
             if 'project_title' in self.session:
-                print 'session is working'
-            title = self.session.get('project_title', None)
+                title = self.session['project_title']
+            else:
+                title = None
             logging.info(title)
-            content = self.session.get('project_content', None)
+            if 'project_content' in self.session:
+                content = self.session.get('project_content')
+            else:
+                content = None
             logging.info(content)
             self.render_json({'status': 'Project loaded', 'project_title': title, 'project_content': content})
         else:
-            self.render_json({'status': 'Nothing to load'})
+            if 'project_title' in self.session:
+                title = self.session['project_title']
+            else:
+                title = None
+            logging.info(title)
+            if 'project_content' in self.session:
+                content = self.session.get('project_content')
+            else:
+                content = None
+            logging.info(content)
+            self.render_json({'status': 'Nothing to load', 'project_title': title, 'project_content': content})
 
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),
