@@ -1,12 +1,12 @@
 
 $(function() {
 	$( "#sortable1" ).find("li").draggable({
-	    connectToSortable: ".connectedSortable",
+	    connectToSortable: ".connected-sortable",
 	    forcePlaceholderSize: false,
       helper: "clone",
       distance: 20
 	});
-    $(".connectedSortable").sortable({
+    $(".connected-sortable").sortable({
         receive: function(e,ui) {
             copyHelper= null;
         },
@@ -15,6 +15,28 @@ $(function() {
           $(ui.item).find(".remove-command").on('click', function() {
             $(this).parent().remove();
           });
+
+          console.log("changed");
         }
     });
+
+    $('#getJson').on('click', function() {
+
+    	var commands = $('#sortable2').find("li");
+    	var json = [];
+    	commands.each(function(index) {
+    		var command = {};
+    		command['title'] = $(this).find(".title").html();
+
+    		var params = $(this).find(".param");
+    		params.each(function(){
+    			command[$(this).prop('name')] = $(this).val();
+    		});
+    		json.push(command);
+    	});
+    	var obj = {};
+    	obj['data'] = json;
+    	$('#feedback-area').html(JSON.stringify(obj));
+    });
 });
+
