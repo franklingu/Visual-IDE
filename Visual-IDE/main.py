@@ -32,6 +32,10 @@ class BaseHanlder(webapp2.RequestHandler):
     def render_response(self, template, template_values):
         self.response.out.write(template.render(template_values))
 
+    def render_json(self, obj):
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json.dumps(obj))
+
 
 class IndexHandler(BaseHanlder):
     def dispatch(self):
@@ -59,10 +63,6 @@ class SaveProjectHandler(BaseHanlder):
             self.session['project_content'] = 'this is test'
             self.render_json({'status': 'loggedout'})
 
-    def render_json(self, obj):
-        self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps(obj))
-
 
 class LoadProjecthandler(BaseHanlder):
     def get(self):
@@ -72,10 +72,6 @@ class LoadProjecthandler(BaseHanlder):
             self.session['project_name'] = 'haha'
             self.session['project_content'] = 'this is test'
             self.render_json({'status': 'loggedout'})
-
-    def render_json(self, obj):
-        self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps(obj))
 
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),

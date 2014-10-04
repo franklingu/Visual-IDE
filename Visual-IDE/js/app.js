@@ -1,27 +1,26 @@
-
-$(function() {
+$(function () {
     $( "#sortable1" ).find("li").draggable({
         connectToSortable: ".connected-sortable",
         forcePlaceholderSize: false,
-      helper: "clone",
-      distance: 20
+        helper: "clone",
+        distance: 20
     });
+
     $(".connected-sortable").sortable({
-        receive: function(e,ui) {
+        receive: function (e,ui) {
             copyHelper= null;
         },
 
-        update: function(e, ui){
-          $(ui.item).find(".remove-command").on('click', function() {
-            $(this).parent().remove();
-          });
+        update: function (e, ui) {
+            $(ui.item).find(".remove-command").on('click', function() {
+                $(this).parent().remove();
+            });
 
-          console.log("changed");
+            console.log("changed");
         }
     });
 
-    $('#getJson').on('click', function() {
-
+    $('#getJson').on('click', function () {
         var commands = $('#sortable2').find("li");
         var json = [];
         commands.each(function(index) {
