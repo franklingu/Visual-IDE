@@ -1,3 +1,11 @@
+$(document).ready(function(){
+    var objStr = $.cookie("obj");
+    $.removeCookie('obj');
+    if (objStr) {
+        console.log(JSON.parse(objStr));
+    }
+});
+
 $(function () {
     $( "#sortable1" ).find("li").draggable({
         connectToSortable: ".connected-sortable",
@@ -65,9 +73,6 @@ $(function () {
             console.log(res['status']);
             console.log(res['project_title']);
             console.log(res['project_content']);
-            var objStr = $.cookie("obj");
-            console.log(JSON.parse(objStr));
         });
     });
 });
-
