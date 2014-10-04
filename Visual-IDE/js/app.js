@@ -50,6 +50,16 @@ $(function () {
         request.done(function (res) {
             console.log(res['status']);
         });
-    })
+    });
+
+    $('#loadJson').on('click', function () {
+        var obj = {'title': 'default-title'};
+        var request = $.ajax({url: '/load/', type: 'GET', data: obj, dataType: 'json'});
+        request.done(function (res) {
+            console.log(res['status']);
+            console.log(res['project_title']);
+            console.log(res['project_content']);
+        });
+    });
 });
 

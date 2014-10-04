@@ -41,10 +41,6 @@ class BaseHanlder(webapp2.RequestHandler):
 
 
 class IndexHandler(BaseHanlder):
-    def dispatch(self):
-        self.session = Session()
-        webapp2.RequestHandler.dispatch(self)
-
     def get(self):
         template = jinja_environment.get_template('index.html')
         template_values = {}
@@ -59,16 +55,16 @@ class IndexHandler(BaseHanlder):
 
 class SaveProjectHandler(BaseHanlder):
     def post(self):
+        dic = self.convert_multi_dict_to_dict(self.request.POST)
+        title = dic.get('project_title')
+        content = json.dumps(dic.get('project_content'))
         if self.set_user_if_loggedin():
             email = self.user.email()
-            dic = self.convert_multi_dict_to_dict(self.request.POST)
-            title = dic.get('project_title')
-            content = json.dumps(dic.get('project_content'))
             DbManager.save_project(email, title, content)
             self.render_json({'status': 'Project saved'})
         else:
-            self.session['project_name'] = 'haha'
-            self.session['project_content'] = 'this is test'
+            self.session['project_name'] = title
+            self.session['project_content'] = content
             self.render_json({'status': 'Please login first'})
 
     def convert_multi_dict_to_dict(self, multi_dic):
@@ -93,10 +89,14 @@ class SaveProjectHandler(BaseHanlder):
 class LoadProjecthandler(BaseHanlder):
     def get(self):
         if self.set_user_if_loggedin():
-            self.render_json({'status': 'Project loaded'})
+            if 'project_title' in self.session:
+                print 'session is working'
+            title = self.session.get('project_title', None)
+            logging.info(title)
+            content = self.session.get('project_content', None)
+            logging.info(content)
+            self.render_json({'status': 'Project loaded', 'project_title': title, 'project_content': content})
         else:
-            self.session['project_name'] = 'haha'
-            self.session['project_content'] = 'this is test'
             self.render_json({'status': 'Nothing to load'})
 
 app = webapp2.WSGIApplication([
