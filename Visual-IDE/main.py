@@ -85,8 +85,15 @@ class SaveProjectHandler(BaseHanlder):
 class LoadProjecthandler(BaseHanlder):
     def get(self):
         if self.set_user_if_loggedin():
-            title = None
-            content = None
+            user_email = self.user.email()
+            project_title = self.request.GET.get('project_title')
+            project = DbManager.get_saved_project_for_user(user_email, project_title)
+            if project:
+                title = project.project_title
+                content = project.project_content
+            else:
+                title = None
+                content = None
             self.render_json({'status': 'Project loaded', 'project_title': title, 'project_content': content})
         else:
             self.render_json({'status': 'Please login first'})
