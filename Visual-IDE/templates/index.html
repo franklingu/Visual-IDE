@@ -14,7 +14,21 @@
   <script type="text/javascript" src="/js/app.js"></script>
 </head>
 <body>
-  {%if user_name%}<a href="{{logout_url}}">Logout</a>{%else%}<a href="{{login_url}}">Login</a>{%endif%}
+  {%if user_name%}<a href="{{logout_url}}">Logout</a>
+  <div class="dropdown">
+    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+      Load
+      {% if tiles_list %}
+        <span class="caret"></span>
+      {% endif %}
+    </button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+      {% for title in titles_list %}
+        <li role="presentation" class="load-title"><a role="menuitem" tabindex="-1" href="#">{{title}}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+  {%else%}<a href="{{login_url}}">Login</a>{%endif%}
   <ul id="sortable1" class="connected-sortable1">
     <li class="ui-state-default">
       <div class="command">
