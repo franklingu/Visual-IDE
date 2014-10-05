@@ -1,3 +1,10 @@
+#mainContent {
+  padding-top: 100px;
+}
+
+#menuBar {
+  font-size: 18px;
+}
 
 #sortable1, #sortable2 {
   border: 1px solid #eee;

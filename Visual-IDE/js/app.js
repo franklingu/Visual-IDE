@@ -53,7 +53,13 @@ $(function () {
 
     $('#save-title').on('click', function () {
         var obj = getSequenceJson();
-        obj['title'] = 'default-title';
+        title = $('#saveTitleName').val();
+        if (title === null) {
+            alert("Please provide a name for the program to be saved");
+            return false;
+        }
+
+        obj['title'] = title;
         var request = $.ajax({url: '/save/', type: 'POST', data: obj, dataType: 'json'});
         request.done(function (res) {
             console.log(res['status']);
@@ -64,6 +70,8 @@ $(function () {
         request.fail(function () {
             $.cookie("obj", JSON.stringify(obj));
         });
+
+        return false;
     });
 
     $('.load-title').on('click', function () {
