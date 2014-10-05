@@ -51,7 +51,7 @@ $(function () {
         return obj;
     }
 
-    $('#saveJson').on('click', function () {
+    $('#save-title').on('click', function () {
         var obj = getSequenceJson();
         obj['title'] = 'default-title';
         var request = $.ajax({url: '/save/', type: 'POST', data: obj, dataType: 'json'});

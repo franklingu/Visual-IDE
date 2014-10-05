@@ -34,6 +34,8 @@
   {%else%}
     <a href="{{login_url}}">Login</a>
     <div title="Please login to load" class="btn btn-default dropdown"><strike>Load</strike></div>
+    <div title="Please login to save" class="btn btn-default"><strike>Save</strike></div>
+
   {%endif%}
   <ul id="sortable1" class="connected-sortable1">
     <li class="ui-state-default">
@@ -83,7 +85,6 @@
       </div>
     </li>
     <button class = "btn btn-default" id="getJson">JSON</button>
-    <button class="btn btn-default" id="saveJson">Save</button>
   </ul>
 
   <ul id="sortable2" class="connected-sortable">
