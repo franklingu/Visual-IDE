@@ -51,7 +51,7 @@ $(function () {
         return obj;
     }
 
-    $('#save-title').on('click', function () {
+    $('.save-title').on('click', function () {
         var obj = getSequenceJson();
         title = $('#saveTitleName').val();
         if (title === null) {
