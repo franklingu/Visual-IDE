@@ -1,37 +1,7 @@
 $(document).ready(function() {
     var objStr = $.cookie("obj");
-    if (objStr) {
-        objStr = JSON.parse(objStr);
 
-        $.each(objStr["data"], function(index) {
-            var listElement = $('<li>').addClass('ui-state-default');
-
-
-            $.each(objStr["data"][index], function(k, v) {
-                if (k == "title") {
-                    var command = $('<div>').addClass('command');
-                    var commandName = $('<div>').addClass(k)
-                        .text(v);
-                    command.append(commandName);
-                    listElement.append(command);
-
-                } else {
-
-                    var param = $('<input>').attr('type', 'text')
-                        .addClass('param').attr('name', k)
-                        .attr('value', v);
-                    listElement.append(param);
-
-                }
-
-            });
-
-            $('#sortable2').append(listElement)
-        });
-
-
-    }
-
+    loadFromJSON(objStr);
     /*$.removeCookie('obj');
     if (objStr) {
         console.log(JSON.parse(objStr));
@@ -115,3 +85,37 @@ $(function() {
         });
     });
 });
+
+function loadFromJSON(objStr){
+        if (objStr) {
+        objStr = JSON.parse(objStr);
+
+        $.each(objStr["data"], function(index) {
+            var listElement = $('<li>').addClass('ui-state-default');
+
+
+            $.each(objStr["data"][index], function(k, v) {
+                if (k == "title") {
+                    var command = $('<div>').addClass('command');
+                    var commandName = $('<div>').addClass(k)
+                        .text(v);
+                    command.append(commandName);
+                    listElement.append(command);
+
+                } else {
+
+                    var param = $('<input>').attr('type', 'text')
+                        .addClass('param').attr('name', k)
+                        .attr('value', v);
+                    listElement.append(param);
+
+                }
+
+            });
+
+            $('#sortable2').append(listElement)
+        });
+
+
+    }
+}
