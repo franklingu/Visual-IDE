@@ -1,7 +1,14 @@
+#mainContent {
+  padding-top: 100px;
+}
+
+#menuBar {
+  font-size: 18px;
+}
 
 #sortable1, #sortable2 {
-  border: 1px solid #eee;
-  width: 142px;
+  border: 1px solid #bbb;
+  width: 200px;
   min-height: 20px;
   list-style-type: none;
   margin: 0;
@@ -15,15 +22,21 @@
   width: 500px;
 }
 
-#sortable1 li, #sortable2 li {
-  margin: 0 5px 5px 5px;
-  padding: 5px;
-  font-size: 1.2em;
-  width: 120px;
-}
-
 #sortable1 > .place-holder {
   display: none;
+}
+
+.title {
+  display: inline;
+}
+
+.command-container {
+  border: thin #ccc solid;
+  cursor: move;
+  font-size: 1.2em;
+  height: 45px;
+  margin: 0 5px 5px 5px;
+  padding: 5px;
 }
 
 .remove-command {
@@ -38,7 +51,7 @@
   }
 
 .feedback-area{
-   border: 1px solid #eee;
+  border: 1px solid #eee;
   width: 142px;
   min-height: 20px;
   list-style-type: none;
@@ -49,6 +62,10 @@
 }
 
 .param{
-  width: 30px;
-  display: inline;
+  float: right;
+  font-size: 13px;
+  height: 33px;
+  width: 50px;
+  border: thin #ccc solid;
+  border-radius: 3px;
 }

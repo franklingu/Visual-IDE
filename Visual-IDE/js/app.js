@@ -81,16 +81,18 @@ $(function() {
         return obj;
     }
 
-    $('#saveJson').on('click', function() {
+    $('.save-title').on('click', function () {
         var obj = getSequenceJson();
-        obj['title'] = 'default-title';
-        var request = $.ajax({
-            url: '/save/',
-            type: 'POST',
-            data: obj,
-            dataType: 'json'
-        });
-        request.done(function(res) {
+        title = $('#saveTitleName').val();
+        if (!title) {
+            alert("Please provide a name for the program to be saved");
+            return false;
+        }
+
+        obj['title'] = title;
+        var request = $.ajax({url: '/save/', type: 'POST', data: obj, dataType: 'json'});
+        request.done(function (res) {
+
             console.log(res['status']);
             if (res['status'] === 'Please login first') {
                 $.cookie("obj", JSON.stringify(obj));
@@ -99,19 +101,14 @@ $(function() {
         request.fail(function() {
             $.cookie("obj", JSON.stringify(obj));
         });
+
+        return false;
     });
 
-    $('#loadJson').on('click', function() {
-        var obj = {
-            'title': 'default-title'
-        };
-        var request = $.ajax({
-            url: '/load/',
-            type: 'GET',
-            data: obj,
-            dataType: 'json'
-        });
-        request.done(function(res) {
+    $('.load-title').on('click', function () {
+        var obj = {'title': $(this).attr('data-value')};
+        var request = $.ajax({url: '/load/?project_title='+obj.title, type: 'GET', data: obj, dataType: 'json'});
+        request.done(function (res) {
             console.log(res['status']);
             console.log(res['project_title']);
             console.log(res['project_content']);
