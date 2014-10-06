@@ -54,7 +54,7 @@ $(function () {
     $('.save-title').on('click', function () {
         var obj = getSequenceJson();
         title = $('#saveTitleName').val();
-        if (title === null) {
+        if (!title) {
             alert("Please provide a name for the program to be saved");
             return false;
         }
@@ -75,8 +75,7 @@ $(function () {
     });
 
     $('.load-title').on('click', function () {
-        var obj = {'title': $(this).prop('data-value')};
-        var request = $.ajax({url: '/load/', type: 'GET', data: obj, dataType: 'json'});
+        var obj = {'title': $(this).attr('data-value')};
         var request = $.ajax({url: '/load/?project_title='+obj.title, type: 'GET', data: obj, dataType: 'json'});
         request.done(function (res) {
             console.log(res['status']);

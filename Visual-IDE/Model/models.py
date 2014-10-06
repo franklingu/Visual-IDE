@@ -13,13 +13,17 @@ class DbManager(object):
         super(DbManager, self).__init__()
 
     @classmethod
-    def get_saved_projects_for_user(self, user_email):
+    def get_saved_project_titles_for_user(self, user_email):
         query_results = db.GqlQuery("SELECT * FROM SavedProject WHERE user_email = :1", user_email)
-        return query_results
+        titles_list = []
+        for item in query_results:
+            titles_list.append(item.project_title)
+        return titles_list
 
     @classmethod
     def get_saved_project_for_user(self, user_email, project_title):
-        query_results = db.GqlQuery("SELECT * FROM SavedProject WHERE user_email = :1", user_email).get()
+        query_results = db.GqlQuery("SELECT * FROM SavedProject WHERE user_email = :1 AND project_title = :2",
+                                    user_email, project_title).get()
         return query_results
 
     @classmethod

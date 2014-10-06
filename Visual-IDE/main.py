@@ -45,6 +45,8 @@ class IndexHandler(BaseHanlder):
         if self.set_user_if_loggedin():
             template_values['user_name'] = self.user.nickname()
             template_values['logout_url'] = self.get_logout_url()
+            titles_list = DbManager.get_saved_project_titles_for_user(self.user.email())
+            template_values['titles_list'] = titles_list
             self.render_response(template, template_values)
         else:
             template_values['login_url'] = self.get_login_url()
@@ -97,6 +99,16 @@ class LoadProjecthandler(BaseHanlder):
             self.render_json({'status': 'Project loaded', 'project_title': title, 'project_content': content})
         else:
             self.render_json({'status': 'Please login first'})
+
+
+class LoadTitlesListHandler(BaseHanlder):
+    def get(self):
+        if self.set_user_if_loggedin():
+            titles_list = DbManager.get_saved_project_titles_for_user(self.user.email())
+            self.render_json({'status': 'Titles list loaded', 'project_title': titles_list})
+        else:
+            self.render_json({'status': 'Please login first'})
+
 
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),
