@@ -2,10 +2,7 @@ $(document).ready(function() {
     var objStr = $.cookie("obj");
 
     loadFromJSON(objStr);
-    /*$.removeCookie('obj');
-    if (objStr) {
-        console.log(JSON.parse(objStr));
-    }*/
+    $.removeCookie('obj');
 });
 
 $(function() {
@@ -19,12 +16,16 @@ $(function() {
     $(".connected-sortable").sortable({
         receive: function(e, ui) {
             copyHelper = null;
+            var obj = getSequenceJson();
+            $.cookie("obj", JSON.stringify(obj));
         },
 
         update: function(e, ui) {
             $(ui.item).find(".remove-command").on('click', function() {
                 $(this).parent().remove();
             });
+            var obj = getSequenceJson();
+            $.cookie("obj", JSON.stringify(obj));
         }
     });
 
@@ -80,42 +81,39 @@ $(function() {
         var request = $.ajax({url: '/load/?project_title='+obj.title, type: 'GET', data: obj, dataType: 'json'});
         request.done(function (res) {
             console.log(res['status']);
-            console.log(res['project_title']);
-            console.log(res['project_content']);
+            loadFromJSON(JSON.stringify(res));
         });
     });
 });
 
 function loadFromJSON(objStr){
-        if (objStr) {
+    if (objStr) {
+        $('#sortable2').empty();
         objStr = JSON.parse(objStr);
 
-        $.each(objStr["data"], function(index) {
-            var listElement = $('<li>').addClass('ui-state-default');
+        function loadJSONData(obj) {
+            $.each(obj, function(index) {
+                var listElement = $('<li>').addClass('ui-state-default');
 
+                $.each(obj[index], function(k, v) {
+                    if (k == "title") {
+                        var command = $('<div>').addClass('command');
+                        var commandName = $('<div>').addClass(k).text(v);
+                        command.append(commandName);
+                        listElement.append(command);
+                    } else {
+                        var param = $('<input>').attr('type', 'text')
+                            .addClass('param').attr('name', k)
+                            .attr('value', v);
+                        listElement.append(param);
+                    }
 
-            $.each(objStr["data"][index], function(k, v) {
-                if (k == "title") {
-                    var command = $('<div>').addClass('command');
-                    var commandName = $('<div>').addClass(k)
-                        .text(v);
-                    command.append(commandName);
-                    listElement.append(command);
+                });
 
-                } else {
-
-                    var param = $('<input>').attr('type', 'text')
-                        .addClass('param').attr('name', k)
-                        .attr('value', v);
-                    listElement.append(param);
-
-                }
-
+                $('#sortable2').append(listElement);
             });
+        }
 
-            $('#sortable2').append(listElement)
-        });
-
-
+        loadJSONData(objStr.data);
     }
 }

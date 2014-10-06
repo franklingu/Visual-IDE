@@ -92,11 +92,11 @@ class LoadProjecthandler(BaseHanlder):
             project = DbManager.get_saved_project_for_user(user_email, project_title)
             if project:
                 title = project.project_title
-                content = project.project_content
+                content = json.loads(project.project_content)
             else:
                 title = None
                 content = None
-            self.render_json({'status': 'Project loaded', 'project_title': title, 'project_content': content})
+            self.render_json({'status': 'Project loaded', 'title': title, 'data': content})
         else:
             self.render_json({'status': 'Please login first'})
 
