@@ -62,15 +62,23 @@ $(function() {
 
         obj['title'] = title;
         var request = $.ajax({url: '/save/', type: 'POST', data: obj, dataType: 'json'});
+
         request.done(function (res) {
 
             console.log(res['status']);
             if (res['status'] === 'Please login first') {
                 $.cookie("obj", JSON.stringify(obj));
+                $('.alert-danger').children('span').html('Please login before saving your work.');
+                $('.alert-danger').slideDown(500).delay(2000).slideUp(500);
+            } else {
+                $('.alert-success').children('span').html('Your program has been saved!');
+                $('.alert-success').slideDown(500).delay(2000).slideUp(500);
             }
         });
         request.fail(function() {
             $.cookie("obj", JSON.stringify(obj));
+            $('.alert-danger').children('span').html('An internal error occurred. Please try again later.');
+            $('.alert-danger').slideDown(500).delay(2000).slideUp(500);
         });
 
         return false;
@@ -82,6 +90,13 @@ $(function() {
         request.done(function (res) {
             console.log(res['status']);
             loadFromJSON(JSON.stringify(res));
+            $('.alert-success').children('span').html('Your program has been loaded!');
+            $('.alert-success').slideDown(500).delay(2000).slideUp(500);
+        });
+
+        request.fail(function() {
+            $('.alert-danger').children('span').html('An internal error occurred. Please try again later.');
+            $('.alert-danger').slideDown(500).delay(2000).slideUp(500);
         });
     });
 });
