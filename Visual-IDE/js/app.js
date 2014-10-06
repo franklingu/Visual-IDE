@@ -108,23 +108,21 @@ function loadFromJSON(objStr){
 
         function loadJSONData(obj) {
             $.each(obj, function(index) {
-                var listElement = $('<li>').addClass('ui-state-default');
-
+                var listElement = $('<li>').addClass('ui-state-default').addClass('command-container');
+                var command = $('<div>').addClass('command');
                 $.each(obj[index], function(k, v) {
                     if (k == "title") {
-                        var command = $('<div>').addClass('command');
                         var commandName = $('<div>').addClass(k).text(v);
                         command.append(commandName);
-                        listElement.append(command);
                     } else {
                         var param = $('<input>').attr('type', 'text')
                             .addClass('param').attr('name', k)
                             .attr('value', v);
-                        listElement.append(param);
+                        command.append(param);
                     }
-
                 });
-
+                
+                listElement.append(command);
                 $('#sortable2').append(listElement);
             });
         }
