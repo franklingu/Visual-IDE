@@ -54,7 +54,7 @@ $(function() {
 
     $('.save-title').on('click', function () {
         var obj = getSequenceJson();
-        title = $('#saveTitleName').val();
+        var title = $('#saveTitleName').val();
         if (!title) {
             alert("Please provide a name for the program to be saved");
             return false;
@@ -64,8 +64,8 @@ $(function() {
         var request = $.ajax({url: '/save/', type: 'POST', data: obj, dataType: 'json'});
 
         request.done(function (res) {
-
             console.log(res['status']);
+            console.log(res['titles_list']);
             if (res['status'] === 'Please login first') {
                 $.cookie("obj", JSON.stringify(obj));
                 $('.alert-danger').children('span').html('Please login before saving your work.');
@@ -90,6 +90,7 @@ $(function() {
         request.done(function (res) {
             console.log(res['status']);
             loadFromJSON(JSON.stringify(res));
+            $('#saveTitleName').val(res['title']);
             $('.alert-success').children('span').html('Your program has been loaded!');
             $('.alert-success').slideDown(500).delay(2000).slideUp(500);
         });
