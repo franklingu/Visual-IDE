@@ -61,7 +61,11 @@ $(function() {
         }
 
         obj['title'] = title;
-        var request = $.ajax({url: '/save/', type: 'POST', data: obj, dataType: 'json'});
+        var request = $.ajax({url: '/save/', type: 'POST', data: obj, dataType: 'json',
+            beforeSend:function(xhr){
+                $('.save-title').attr('disabled', true);
+            }
+        });
 
         request.done(function (res) {
             console.log(res['status']);
@@ -74,11 +78,13 @@ $(function() {
                 $('.alert-success').children('span').html('Your program has been saved!');
                 $('.alert-success').slideDown(500).delay(2000).slideUp(500);
             }
+            $('.save-title').attr('disabled', false);
         });
         request.fail(function() {
             $.cookie("obj", JSON.stringify(obj));
             $('.alert-danger').children('span').html('An internal error occurred. Please try again later.');
             $('.alert-danger').slideDown(500).delay(2000).slideUp(500);
+            $('.save-title').attr('disabled', false);
         });
 
         return false;
@@ -86,18 +92,25 @@ $(function() {
 
     $('.load-title').on('click', function () {
         var obj = {'project_title': $(this).attr('data-value')};
-        var request = $.ajax({url: '/load/', type: 'GET', data: obj, dataType: 'json'});
+        var request = $.ajax({url: '/load/', type: 'GET', data: obj, dataType: 'json',
+            beforeSend:function(xhr) {
+                $('.load-title').attr('disabled', true);
+            }
+        });
+
         request.done(function (res) {
             console.log(res['status']);
             loadFromJSON(JSON.stringify(res));
             $('#saveTitleName').val(res['title']);
             $('.alert-success').children('span').html('Your program has been loaded!');
             $('.alert-success').slideDown(500).delay(2000).slideUp(500);
+            $('.load-title').attr('disabled', false);
         });
 
         request.fail(function() {
             $('.alert-danger').children('span').html('An internal error occurred. Please try again later.');
             $('.alert-danger').slideDown(500).delay(2000).slideUp(500);
+            $('.load-title').attr('disabled', false);
         });
     });
 });
