@@ -2,7 +2,7 @@ $(document).ready(function() {
     var objStr = $.cookie("obj");
 
     loadFromJSON(objStr);
-    $.removeCookie('obj');
+ 
 });
 
 $(function() {
