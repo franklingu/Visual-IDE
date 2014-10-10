@@ -17,8 +17,8 @@ handlers:
   static_dir: lib/css
   mime_type: "text/css"
 
-- url: /lib/font
-  static_dir: lib/font
+- url: /lib/fonts
+  static_dir: lib/fonts
   mime_type: "text/plain-text"
 
 - url: /css

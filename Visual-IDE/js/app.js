@@ -21,7 +21,7 @@ $(function() {
         },
 
         update: function(e, ui) {
-            $(ui.item).find(".remove-command").on('click', function() {
+            $(ui.item).find(".remove-command").removeClass('hide').on('click', function() {
                 $(this).parent().remove();
             });
             var obj = getSequenceJson();
@@ -122,12 +122,14 @@ function loadFromJSON(objStr){
 
         function loadJSONData(obj) {
             $.each(obj, function(index) {
-                var listElement = $('<li>').addClass('ui-state-default').addClass('command-container');
+                var listElement = $('<li>').addClass('ui-state-default command-container');
                 var command = $('<div>').addClass('command');
                 $.each(obj[index], function(k, v) {
                     if (k == "title") {
                         var commandName = $('<div>').addClass(k).text(v);
+                        var removeCommand = $('<span>').addClass("glyphicon glyphicon-remove pull-right remove-command");
                         command.append(commandName);
+                        command.append(removeCommand);
                     } else {
                         var param = $('<input>').attr('type', 'text')
                             .addClass('param').attr('name', k)
