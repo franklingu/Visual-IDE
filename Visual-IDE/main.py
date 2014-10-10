@@ -131,7 +131,7 @@ class DeleteProjectHandler(BaseHanlder):
         if project_title is None:
             titles_list = self.get_titles_list_after_delete(project_title)
             self.render_json({STATUS_PROPERTY_NAME: PROJECT_DELETED_STATUS_MSG, 'titles_list': titles_list})
-        if self.set_user_if_loggedin():
+        elif self.set_user_if_loggedin():
             DbManager.delete_project(self.user.email(), project_title)
             titles_list = self.get_titles_list_after_delete(project_title)
             self.render_json({STATUS_PROPERTY_NAME: PROJECT_DELETED_STATUS_MSG, 'titles_list': titles_list})

@@ -22,13 +22,16 @@ $(function() {
 
         update: function(e, ui) {
             $(ui.item).find(".remove-command").removeClass('hide').on('click', function() {
-                $(this).parent().remove();
+                $(this).closest('.command-container').remove();
+                var obj = getSequenceJson();
+                $.cookie("obj", JSON.stringify(obj));
             });
             var obj = getSequenceJson();
             $.cookie("obj", JSON.stringify(obj));
         }
     });
 
+    // this is only for debugging purposes
     $('#getJson').on('click', function() {
         var obj = getSequenceJson();
         $('#feedback-area').html(JSON.stringify(obj));
@@ -140,6 +143,11 @@ function loadFromJSON(objStr){
                 
                 listElement.append(command);
                 $('#sortable2').append(listElement);
+            });
+            $('.remove-command').on('click', function() {
+                $(this).closest('.command-container').remove();
+                var obj = getSequenceJson();
+                $.cookie("obj", JSON.stringify(obj));
             });
         }
 
