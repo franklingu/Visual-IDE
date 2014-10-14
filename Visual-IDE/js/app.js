@@ -52,6 +52,7 @@ $(function() {
         request.done(function (res) {
             console.log(res['status']);
             console.log(res['titles_list']);
+            syncTitlesList(res['titles_list']);
             if (res['status'] === 'Please login first') {
                 $.cookie("obj", JSON.stringify(obj));
                 $('.alert-danger').children('span').html('Please login before saving your work.');
@@ -72,8 +73,9 @@ $(function() {
         return false;
     });
 
-    $('.load-title').on('click', function () {
-        var obj = {'project_title': $(this).attr('data-value')};
+    $('#load-titles-list').on('click', '.load-project', function () {
+        var obj = {'project_title': $(this).html()};
+        console.log('inside delegate load');
         var request = $.ajax({url: '/load/', type: 'GET', data: obj, dataType: 'json',
             beforeSend:function(xhr) {
                 $('.load-title').attr('disabled', true);
@@ -96,7 +98,7 @@ $(function() {
         });
     });
 
-    $('.remove-project').on('click', function () {
+    $('#load-titles-list').on('click', '.remove-project', function () {
         var project_title = $(this).prev().html();
         var obj = {'project_title': project_title};
         var request = $.ajax({url: '/delete/', type: 'POST', data: obj, dataType: 'json',
@@ -107,6 +109,8 @@ $(function() {
 
         request.done(function (res) {
             console.log(res['status']);
+            syncTitlesList(res['titles_list']);
+            $('#saveTitleName').val('');
             $('.alert-success').children('span').html('Your program has been deleted!');
             $('.alert-success').slideDown(500).delay(2000).slideUp(500);
             $('.remove-project').attr('disabled', false);
@@ -136,7 +140,22 @@ var getSequenceJson = function() {
     var obj = {};
     obj['data'] = json;
     return obj;
-}
+};
+
+var syncTitlesList = function (titlesList) {
+    $('#load-titles-list').empty();
+    var listLength = titlesList.length;
+    function createLoadTitleItem(title) {
+        var elem = '<li role="presentation"><a href="#" tabindex="-1" class="link">' +
+                    '<span class="load-project">' + title + '</span>' +
+                    '<span class="glyphicon glyphicon-remove pull-right remove-project"></span>' +
+                    '</a></li>';
+        return elem;
+    }
+    for (var i=0;i<listLength;i++) {
+        $('#load-titles-list').append(createLoadTitleItem(titlesList[i]));
+    }
+};
 
 function loadFromJSON(objStr){
     if (objStr) {

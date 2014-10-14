@@ -37,11 +37,11 @@
               {% endif %}
             </a>
             {% if titles_list %}
-              <ul class="dropdown-menu" role="menu">
+              <ul class="dropdown-menu" role="menu" id="load-titles-list">
                   {% for title in titles_list %}
                     <li role="presentation">
                       <a href="#" tabindex="-1" class="link">
-                        <span class="load-title" data-value="{{title}}">{{title}}</span>
+                        <span class="load-project">{{title}}</span>
                         <span class="glyphicon glyphicon-remove pull-right remove-project"></span>
                       </a>
                     </li>
