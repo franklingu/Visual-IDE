@@ -1,8 +1,6 @@
 $(document).ready(function() {
     var objStr = $.cookie("obj");
-
     loadFromJSON(objStr);
- 
 });
 
 $(function() {
@@ -19,7 +17,6 @@ $(function() {
             var obj = getSequenceJson();
             $.cookie("obj", JSON.stringify(obj));
         },
-
         update: function(e, ui) {
             $(ui.item).find(".remove-command").removeClass('hide').on('click', function() {
                 $(this).closest('.command-container').remove();
@@ -36,24 +33,6 @@ $(function() {
         var obj = getSequenceJson();
         $('#feedback-area').html(JSON.stringify(obj));
     });
-
-    var getSequenceJson = function() {
-        var commands = $('#sortable2').find("li");
-        var json = [];
-        commands.each(function(index) {
-            var command = {};
-            command['title'] = $(this).find(".title").html();
-
-            var params = $(this).find(".param");
-            params.each(function() {
-                command[$(this).prop('name')] = $(this).val();
-            });
-            json.push(command);
-        });
-        var obj = {};
-        obj['data'] = json;
-        return obj;
-    }
 
     $('.save-title').on('click', function () {
         var obj = getSequenceJson();
@@ -116,7 +95,48 @@ $(function() {
             $('.load-title').attr('disabled', false);
         });
     });
+
+    $('.remove-project').on('click', function () {
+        var project_title = $(this).prev().html();
+        var obj = {'project_title': project_title};
+        var request = $.ajax({url: '/delete/', type: 'POST', data: obj, dataType: 'json',
+            beforeSend:function(xhr) {
+                $('.remove-project').attr('disabled', true);
+            }
+        });
+
+        request.done(function (res) {
+            console.log(res['status']);
+            $('.alert-success').children('span').html('Your program has been deleted!');
+            $('.alert-success').slideDown(500).delay(2000).slideUp(500);
+            $('.remove-project').attr('disabled', false);
+        });
+
+        request.fail(function() {
+            $('.alert-danger').children('span').html('An internal error occurred. Please try again later.');
+            $('.alert-danger').slideDown(500).delay(2000).slideUp(500);
+            $('.remove-project').attr('disabled', false);
+        });
+    });
 });
+
+var getSequenceJson = function() {
+    var commands = $('#sortable2').find("li");
+    var json = [];
+    commands.each(function(index) {
+        var command = {};
+        command['title'] = $(this).find(".title").html();
+
+        var params = $(this).find(".param");
+        params.each(function() {
+            command[$(this).prop('name')] = $(this).val();
+        });
+        json.push(command);
+    });
+    var obj = {};
+    obj['data'] = json;
+    return obj;
+}
 
 function loadFromJSON(objStr){
     if (objStr) {

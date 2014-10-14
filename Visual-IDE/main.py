@@ -21,6 +21,7 @@ REQUIRE_LOGIN_FIRST_MSG = 'Please login first'
 class BaseHanlder(webapp2.RequestHandler):
     def dispatch(self):
         super(BaseHanlder, self).dispatch()
+        self.set_user_if_loggedin()
 
     def set_user_if_loggedin(self):
         user = users.get_current_user()
@@ -127,9 +128,9 @@ class LoadProjectHandler(BaseHanlder):
 
 class DeleteProjectHandler(BaseHanlder):
     def post(self):
-        project_title = self.request.GET.get('project_title')
+        project_title = self.request.POST.get('project_title')
         if project_title is None:
-            titles_list = self.get_titles_list_after_delete(project_title)
+            titles_list = []
             self.render_json({STATUS_PROPERTY_NAME: PROJECT_DELETED_STATUS_MSG, 'titles_list': titles_list})
         elif self.set_user_if_loggedin():
             DbManager.delete_project(self.user.email(), project_title)
