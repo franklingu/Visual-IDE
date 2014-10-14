@@ -21,14 +21,17 @@ $(function() {
         },
 
         update: function(e, ui) {
-            $(ui.item).find(".remove-command").on('click', function() {
-                $(this).parent().remove();
+            $(ui.item).find(".remove-command").removeClass('hide').on('click', function() {
+                $(this).closest('.command-container').remove();
+                var obj = getSequenceJson();
+                $.cookie("obj", JSON.stringify(obj));
             });
             var obj = getSequenceJson();
             $.cookie("obj", JSON.stringify(obj));
         }
     });
 
+    // this is only for debugging purposes
     $('#getJson').on('click', function() {
         var obj = getSequenceJson();
         $('#feedback-area').html(JSON.stringify(obj));
@@ -122,12 +125,14 @@ function loadFromJSON(objStr){
 
         function loadJSONData(obj) {
             $.each(obj, function(index) {
-                var listElement = $('<li>').addClass('ui-state-default').addClass('command-container');
+                var listElement = $('<li>').addClass('ui-state-default command-container');
                 var command = $('<div>').addClass('command');
                 $.each(obj[index], function(k, v) {
                     if (k == "title") {
                         var commandName = $('<div>').addClass(k).text(v);
+                        var removeCommand = $('<span>').addClass("glyphicon glyphicon-remove pull-right remove-command");
                         command.append(commandName);
+                        command.append(removeCommand);
                     } else {
                         var param = $('<input>').attr('type', 'text')
                             .addClass('param').attr('name', k)
@@ -138,6 +143,11 @@ function loadFromJSON(objStr){
                 
                 listElement.append(command);
                 $('#sortable2').append(listElement);
+            });
+            $('.remove-command').on('click', function() {
+                $(this).closest('.command-container').remove();
+                var obj = getSequenceJson();
+                $.cookie("obj", JSON.stringify(obj));
             });
         }
 
