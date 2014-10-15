@@ -2,7 +2,6 @@ import webapp2
 import jinja2
 import os
 import json
-import re
 import logging
 from google.appengine.api import users
 from Model.models import DbManager
@@ -63,9 +62,9 @@ class IndexHandler(BaseHanlder):
 
 class SaveProjectHandler(BaseHanlder):
     def post(self):
-        dic = self.convert_multi_dict_to_dict(self.request.POST)
-        title = dic.get('project_title')
-        content = json.dumps(dic.get('project_content'))
+        logging.info(self.request.POST)
+        title = self.request.POST.get('project_title')
+        content = self.request.POST.get('project_content')
         if title is None or content is None:
             titles_list = self.get_titles_list_after_save(title)
             self.render_json({STATUS_PROPERTY_NAME: PROJECT_SAVED_STATUS_MSG, 'titles_list': titles_list})
@@ -86,24 +85,6 @@ class SaveProjectHandler(BaseHanlder):
         else:
             titles_list.append(saved_title)
         return titles_list
-
-    def convert_multi_dict_to_dict(self, multi_dic):
-        dic = {}
-        title = None
-        data = []
-        for key in multi_dic.keys():
-            match_data = re.match(r'^data\[(\d+)\]\[([a-z]+)\]', key)
-            if match_data and match_data.group(2) == 'title':
-                data.append({})
-        for item in multi_dic.keys():
-            match_data = re.match(r'^data\[(\d+)\]\[([a-z]+)\]', item)
-            if match_data:
-                data[int(match_data.group(1))][match_data.group(2)] = multi_dic[item]
-            else:
-                title = multi_dic[item]
-        dic['project_title'] = title
-        dic['project_content'] = data
-        return dic
 
 
 class LoadProjectHandler(BaseHanlder):
