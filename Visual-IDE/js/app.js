@@ -11,6 +11,9 @@ $(function() {
         distance: 20
     });
 
+    $(".sprite").draggable({containment: "parent"});
+    $(".feedback-area").droppable();
+
     $(".connected-sortable").sortable({
         receive: function(e, ui) {
             copyHelper = null;
@@ -165,18 +168,20 @@ var updateSprite = function(commandName, params) {
             break;
 
         case "SetY":
+        console.log("sety");
             setY(params[0]);
             break;
 
         case "Show":
-            $(".sprite").show();
+            $(".sprite").fadeTo("fast", 1);
             break;
 
         case "Hide":
-            $(".sprite").hide();
+            $(".sprite").fadeTo("fast", 0);
             break;
 
         case "Move":
+        console.log("move");
             move(params[0]);
             break;
 
