@@ -31,10 +31,22 @@ $(function() {
     // this is only for debugging purposes
     $('#getJson').on('click', function() {
         var obj = getSequenceJson();
-        $('#feedback-area').html(JSON.stringify(obj));
+
+        $.each(obj.data, function(index) {
+            var commandName;
+            var params = [];
+            $.each(obj.data[index], function(k, v) {
+                if (k == "title")
+                    commandName = v;
+                else
+                    params.push(v);
+            });
+
+            updateSprite(commandName, params);
+        });
     });
 
-    $('.save-title').on('click', function () {
+    $('.save-title').on('click', function() {
         var obj = getSequenceJson();
         var title = $('#saveTitleName').val();
         if (!title) {
@@ -43,13 +55,17 @@ $(function() {
         }
 
         obj['title'] = title;
-        var request = $.ajax({url: '/save/', type: 'POST', data: obj, dataType: 'json',
-            beforeSend:function(xhr){
+        var request = $.ajax({
+            url: '/save/',
+            type: 'POST',
+            data: obj,
+            dataType: 'json',
+            beforeSend: function(xhr) {
                 $('.save-title').attr('disabled', true);
             }
         });
 
-        request.done(function (res) {
+        request.done(function(res) {
             console.log(res['status']);
             console.log(res['titles_list']);
             syncTitlesList(res['titles_list']);
@@ -73,16 +89,22 @@ $(function() {
         return false;
     });
 
-    $('#load-titles-list').on('click', '.load-project', function () {
-        var obj = {'project_title': $(this).html()};
+    $('#load-titles-list').on('click', '.load-project', function() {
+        var obj = {
+            'project_title': $(this).html()
+        };
         console.log('inside delegate load');
-        var request = $.ajax({url: '/load/', type: 'GET', data: obj, dataType: 'json',
-            beforeSend:function(xhr) {
+        var request = $.ajax({
+            url: '/load/',
+            type: 'GET',
+            data: obj,
+            dataType: 'json',
+            beforeSend: function(xhr) {
                 $('.load-title').attr('disabled', true);
             }
         });
 
-        request.done(function (res) {
+        request.done(function(res) {
             console.log(res['status']);
             loadFromJSON(JSON.stringify(res));
             $('#saveTitleName').val(res['title']);
@@ -98,16 +120,22 @@ $(function() {
         });
     });
 
-    $('#load-titles-list').on('click', '.remove-project', function () {
+    $('#load-titles-list').on('click', '.remove-project', function() {
         var project_title = $(this).prev().html();
-        var obj = {'project_title': project_title};
-        var request = $.ajax({url: '/delete/', type: 'POST', data: obj, dataType: 'json',
-            beforeSend:function(xhr) {
+        var obj = {
+            'project_title': project_title
+        };
+        var request = $.ajax({
+            url: '/delete/',
+            type: 'POST',
+            data: obj,
+            dataType: 'json',
+            beforeSend: function(xhr) {
                 $('.remove-project').attr('disabled', true);
             }
         });
 
-        request.done(function (res) {
+        request.done(function(res) {
             console.log(res['status']);
             syncTitlesList(res['titles_list']);
             $('#saveTitleName').val('');
@@ -122,8 +150,77 @@ $(function() {
             $('.remove-project').attr('disabled', false);
         });
     });
+
+    $('.remove-command').on('click', function() {
+        $(this).closest('.command-container').remove();
+        var obj = getSequenceJson();
+        $.cookie("obj", JSON.stringify(obj));
+    });
 });
 
+var updateSprite = function(commandName, params) {
+    switch (commandName) {
+        case "SetX":
+            setX(params[0]);
+            break;
+
+        case "SetY":
+            setY(params[0]);
+            break;
+
+        case "Show":
+            $(".sprite").show();
+            break;
+
+        case "Hide":
+            $(".sprite").hide();
+            break;
+
+        case "Move":
+            move(params[0]);
+            break;
+
+            /* case "Bg" : changeBg(params[0]);
+             break;*/
+    }
+
+    function setX(x) {
+        x = 150 + parseInt(x);
+        x = x > 310 ? 310 : x;
+        x = x < 0 ? 0 : x;
+
+        $(".sprite").animate({
+            left: x
+        });
+    }
+
+
+    function setY(x) {
+        x = 150 - parseInt(x);
+        x = x > 290 ? 290 : x;
+        x = x < 0 ? 0 : x;
+
+        $(".sprite").animate({
+            top: x
+        });
+    }
+
+    function move(x) {
+        var curr = $('.sprite').position().left;
+        var newPos = curr + parseInt(x);
+        console.log(newPos);
+
+        newPos = newPos > 310 ? 310 : newPos;
+        newPos = newPos < 0 ? 0 : newPos;
+
+        $(".sprite").animate({
+            left: newPos
+        });
+
+
+    }
+
+}
 var getSequenceJson = function() {
     var commands = $('#sortable2').find("li");
     var json = [];
@@ -142,22 +239,23 @@ var getSequenceJson = function() {
     return obj;
 };
 
-var syncTitlesList = function (titlesList) {
+var syncTitlesList = function(titlesList) {
     $('#load-titles-list').empty();
     var listLength = titlesList.length;
+
     function createLoadTitleItem(title) {
         var elem = '<li role="presentation"><a href="#" tabindex="-1" class="link">' +
-                    '<span class="load-project">' + title + '</span>' +
-                    '<span class="glyphicon glyphicon-remove pull-right remove-project"></span>' +
-                    '</a></li>';
+            '<span class="load-project">' + title + '</span>' +
+            '<span class="glyphicon glyphicon-remove pull-right remove-project"></span>' +
+            '</a></li>';
         return elem;
     }
-    for (var i=0;i<listLength;i++) {
+    for (var i = 0; i < listLength; i++) {
         $('#load-titles-list').append(createLoadTitleItem(titlesList[i]));
     }
 };
 
-function loadFromJSON(objStr){
+function loadFromJSON(objStr) {
     if (objStr) {
         $('#sortable2').empty();
         objStr = JSON.parse(objStr);
@@ -179,14 +277,9 @@ function loadFromJSON(objStr){
                         command.append(param);
                     }
                 });
-                
+
                 listElement.append(command);
                 $('#sortable2').append(listElement);
-            });
-            $('.remove-command').on('click', function() {
-                $(this).closest('.command-container').remove();
-                var obj = getSequenceJson();
-                $.cookie("obj", JSON.stringify(obj));
             });
         }
 
