@@ -34,8 +34,8 @@
   border: thin #ccc solid;
   cursor: move;
   font-size: 1.2em;
-  height: 45px;
-  margin: 0 5px 5px 5px;
+  min-height: 45px;
+  margin: 10px 5px 5px 5px;
   padding: 5px;
 }
 
@@ -46,16 +46,16 @@
   top:7px;
 }
 
-  .remove-command:active {
-    font-size: 13px;
-    color: red;
-  }
+.remove-command:active {
+  font-size: 13px;
+  color: red;
+}
 
 .feedback-area{
   border: 1px solid #000;
   position: relative;
-top: 10px;
-left: 10px;
+  top: 10px;
+  left: 10px;
   width: 420px;
   height: 420px;
   list-style-type: none;

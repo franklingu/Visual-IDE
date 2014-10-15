@@ -4,6 +4,26 @@ $(document).ready(function() {
 });
 
 $(function() {
+    var sortableUpdateHandle = function(e, ui) {
+        $(ui.item).find(".remove-command").removeClass('hide').on('click', function() {
+            $(this).closest('.command-container').remove();
+            var obj = getSequenceJson();
+            $.cookie("obj", JSON.stringify(obj));
+        });
+        $(ui.item).find('.connected-sortable').removeClass('hide').sortable({
+            receive: sortableReceiveHandle,
+            update: sortableUpdateHandle
+        });
+        var obj = getSequenceJson();
+        $.cookie("obj", JSON.stringify(obj));
+    };
+
+    var sortableReceiveHandle = function(e, ui) {
+        copyHelper = null;
+        var obj = getSequenceJson();
+        $.cookie("obj", JSON.stringify(obj));
+    };
+
     $("#sortable1").find("li").draggable({
         connectToSortable: ".connected-sortable",
         forcePlaceholderSize: false,
@@ -11,27 +31,14 @@ $(function() {
         distance: 20
     });
 
+    $(".connected-sortable").sortable({
+        receive: sortableReceiveHandle,
+        update: sortableUpdateHandle
+    });
+
     $(".sprite").draggable({containment: "parent"});
     $(".feedback-area").droppable();
 
-    $(".connected-sortable").sortable({
-        receive: function(e, ui) {
-            copyHelper = null;
-            var obj = getSequenceJson();
-            $.cookie("obj", JSON.stringify(obj));
-        },
-        update: function(e, ui) {
-            $(ui.item).find(".remove-command").removeClass('hide').on('click', function() {
-                $(this).closest('.command-container').remove();
-                var obj = getSequenceJson();
-                $.cookie("obj", JSON.stringify(obj));
-            });
-            var obj = getSequenceJson();
-            $.cookie("obj", JSON.stringify(obj));
-        }
-    });
-
-    // this is only for debugging purposes
     $('#getJson').on('click', function() {
         var obj = getSequenceJson();
 
@@ -39,10 +46,11 @@ $(function() {
             var commandName;
             var params = [];
             $.each(obj.data[index], function(k, v) {
-                if (k == "title")
+                if (k == "title") {
                     commandName = v;
-                else
+                } else {
                     params.push(v);
+                }
             });
 
             updateSprite(commandName, params);
