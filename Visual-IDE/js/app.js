@@ -50,14 +50,16 @@ $(function() {
     });
 
     $('.save-title').on('click', function() {
-        var obj = getSequenceJson();
+        var obj = {
+            'project_content': JSON.stringify(getSequenceJson()['data'])
+        };
         var title = $('#saveTitleName').val();
         if (!title) {
             alert("Please provide a name for the program to be saved");
             return false;
         }
 
-        obj['title'] = title;
+        obj['project_title'] = title;
         var request = $.ajax({
             url: '/save/',
             type: 'POST',
@@ -69,8 +71,6 @@ $(function() {
         });
 
         request.done(function(res) {
-            console.log(res['status']);
-            console.log(res['titles_list']);
             syncTitlesList(res['titles_list']);
             if (res['status'] === 'Please login first') {
                 $.cookie("obj", JSON.stringify(obj));
@@ -96,7 +96,6 @@ $(function() {
         var obj = {
             'project_title': $(this).html()
         };
-        console.log('inside delegate load');
         var request = $.ajax({
             url: '/load/',
             type: 'GET',
@@ -108,7 +107,6 @@ $(function() {
         });
 
         request.done(function(res) {
-            console.log(res['status']);
             loadFromJSON(JSON.stringify(res));
             $('#saveTitleName').val(res['title']);
             $('.alert-success').children('span').html('Your program has been loaded!');
@@ -139,7 +137,6 @@ $(function() {
         });
 
         request.done(function(res) {
-            console.log(res['status']);
             syncTitlesList(res['titles_list']);
             $('#saveTitleName').val('');
             $('.alert-success').children('span').html('Your program has been deleted!');
@@ -154,7 +151,7 @@ $(function() {
         });
     });
 
-    $('.remove-command').on('click', function() {
+    $('body').on('click', '.remove-command', function() {
         $(this).closest('.command-container').remove();
         var obj = getSequenceJson();
         $.cookie("obj", JSON.stringify(obj));
@@ -213,7 +210,6 @@ var updateSprite = function(commandName, params) {
     function move(x) {
         var curr = $('.sprite').position().left;
         var newPos = curr + parseInt(x);
-        console.log(newPos);
 
         newPos = newPos > 310 ? 310 : newPos;
         newPos = newPos < 0 ? 0 : newPos;
@@ -244,23 +240,7 @@ var getSequenceJson = function() {
     return obj;
 };
 
-var syncTitlesList = function(titlesList) {
-    $('#load-titles-list').empty();
-    var listLength = titlesList.length;
-
-    function createLoadTitleItem(title) {
-        var elem = '<li role="presentation"><a href="#" tabindex="-1" class="link">' +
-            '<span class="load-project">' + title + '</span>' +
-            '<span class="glyphicon glyphicon-remove pull-right remove-project"></span>' +
-            '</a></li>';
-        return elem;
-    }
-    for (var i = 0; i < listLength; i++) {
-        $('#load-titles-list').append(createLoadTitleItem(titlesList[i]));
-    }
-};
-
-function loadFromJSON(objStr) {
+var loadFromJSON = function (objStr) {
     if (objStr) {
         $('#sortable2').empty();
         objStr = JSON.parse(objStr);
@@ -290,4 +270,20 @@ function loadFromJSON(objStr) {
 
         loadJSONData(objStr.data);
     }
-}
+};
+
+var syncTitlesList = function(titlesList) {
+    $('#load-titles-list').empty();
+    var listLength = titlesList.length;
+
+    function createLoadTitleItem(title) {
+        var elem = '<li role="presentation"><a href="#" tabindex="-1" class="link">' +
+            '<span class="load-project">' + title + '</span>' +
+            '<span class="glyphicon glyphicon-remove pull-right remove-project"></span>' +
+            '</a></li>';
+        return elem;
+    }
+    for (var i = 0; i < listLength; i++) {
+        $('#load-titles-list').append(createLoadTitleItem(titlesList[i]));
+    }
+};

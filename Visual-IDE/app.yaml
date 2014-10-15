@@ -5,12 +5,13 @@ api_version: 1
 threadsafe: yes
 
 handlers:
-- url: /img
-  static_dir: img
-
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
+
+- url: /img
+  static_dir: img
+  mime_type: "image/png"
 
 - url: /lib/js
   static_dir: lib/js
