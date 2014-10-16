@@ -5,6 +5,7 @@ $(document).ready(function() {
 
 $(function() {
     var sortableUpdateHandle = function(e, ui) {
+        $(ui.item).find(".remove-command").removeClass('hide');
         $(ui.item).find('.connected-sortable').removeClass('hide').sortable({
             receive: sortableReceiveHandle,
             update: sortableUpdateHandle
