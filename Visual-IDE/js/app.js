@@ -38,9 +38,9 @@ $(function() {
     });
 
     $(".sprite").draggable({containment: "parent"});
-    $(".feedback-area").droppable();
+    $("#feedbackArea").droppable();
 
-    $('#getJson').on('click', function() {
+    $('#playButton').on('click', function() {
         var obj = getSequenceJson();
 
         $.each(obj.data, function(index) {

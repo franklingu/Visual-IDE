@@ -1,5 +1,5 @@
 #mainContent {
-  padding-top: 100px;
+  padding-top: 70px;
 }
 
 #menuBar {
@@ -8,12 +8,10 @@
 
 #sortable1, #sortable2 {
   border: 3px solid #000;
-  width: 150px;
   min-height: 20px;
   list-style-type: none;
   margin: 0;
   padding: 0 0 0 0;
-  float: left;
 }
 
 #sortable1 {
@@ -23,7 +21,6 @@
 
 #sortable2 {
   min-height: 400px;
-  width: 250px;
 }
 
 #sortable1 > .place-holder {
@@ -66,6 +63,8 @@
   color: black;
   font-size: 14px;
   top:7px;
+  left: 5px;
+  right: 5px;
 }
 
 .remove-command:active {
@@ -73,17 +72,10 @@
   color: red;
 }
 
-.feedback-area{
+#feedbackArea{
   border: 1px solid #000;
-  position: relative;
-  top: 10px;
-  left: 10px;
-  width: 420px;
-  height: 420px;
-  list-style-type: none;
-  margin: 0;
-  padding: 0 0 0 0;
-  float: left;
+  height: 500px;
+  padding: 0;
 }
 
 .param{
@@ -107,8 +99,29 @@
 
 .plain-list {
   padding: 0;
+  list-style-type: none;
 }
 
 .wide {
   width: 200px !important;
+}
+
+#playButton {
+  color: #ede275;
+}
+
+  #playButton:hover {
+    color: #bab042;
+  }
+
+  #playButton:active {
+    color: white;
+  }
+
+  .canvas-area {
+    margin-top: 10px;
+  }
+
+#programContainer {
+  padding-left: 0;
 }
