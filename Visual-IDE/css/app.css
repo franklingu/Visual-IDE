@@ -20,62 +20,55 @@
 }
 
 #sortable2 {
-  min-height: 400px;
+  min-height: 480px;
 }
 
 #sortable1 > .place-holder {
   display: none;
 }
 
+#programContainer {
+  padding-left: 0;
+}
+
+.repeat-list {
+  min-height: 30px;
+  margin-top: 20px;
+  border: thin dashed #000;
+}
+
 .title {
   display: inline;
-}
-
-.command-container {
-  border: thin #ccc solid !important;
-  cursor: move;
-  font-size: 1.2em;
-  height: 45px !important;
-  padding: 5px !important;
-}
-
-.template-command-container {
-  border: thin #ccc solid;
-  cursor: move;
-  display: inline-block;
-  font-size: 1.2em;
-  height: 45px;
-  margin: 3px 2px;
-  padding: 5px;
-  width: 24%;
-  z-index: 100;
+  margin-left: 10px;
 }
 
 #headerCommand {
   background-color: black;
   color: white;
-  font-size: 1.2em;
+  font-size: 14px;
   padding: 2px;
 }
 
-.remove-command {
-  cursor: pointer;
-  color: black;
+.command-container {
+  border: thin #ccc solid !important;
+  cursor: move;
   font-size: 14px;
-  top:7px;
-  left: 5px;
-  right: 5px;
+  min-height: 45px !important;
+  padding: 5px !important;
 }
 
-.remove-command:active {
-  font-size: 13px;
-  color: red;
-}
-
-#feedbackArea{
-  border: 1px solid #000;
-  height: 500px;
-  padding: 0;
+.template-command-container {
+  background-color: #eee;
+  border: thin #ccc solid;
+  border-radius: 10px;
+  cursor: move;
+  display: inline-block;
+  font-size: 14px;
+  height: 45px;
+  margin: 3px 2px;
+  padding: 5px;
+  width: 24%;
+  z-index: 100;
 }
 
 .param{
@@ -87,23 +80,30 @@
   border-radius: 3px;
 }
 
+.remove-command {
+  cursor: pointer;
+  color: #C00;
+  font-size: 14px;
+  top:7px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+  .remove-command:active {
+    font-size: 13px;
+    color: black;
+  }
+
+#feedbackArea{
+  border: 1px solid #000;
+  height: 500px;
+  padding: 0;
+}
+
 .sprite{
   position: relative;
   top: 150px;
   left: 150px;
-}
-
-.align-center {
-  text-align: center;
-}
-
-.plain-list {
-  padding: 0;
-  list-style-type: none;
-}
-
-.wide {
-  width: 200px !important;
 }
 
 #playButton {
@@ -118,10 +118,19 @@
     color: white;
   }
 
+.align-center {
+  text-align: center;
+}
+
+.plain-list {
+  padding: 0;
+  list-style-type: none;
+}
+
+.wide {
+  width: 200px !important;
+}
+
   .canvas-area {
     margin-top: 10px;
   }
-
-#programContainer {
-  padding-left: 0;
-}
