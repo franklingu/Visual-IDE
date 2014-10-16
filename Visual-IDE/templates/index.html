@@ -10,7 +10,6 @@
 
   <script type="text/javascript" src="/lib/js/jquery-1.10.2.js"></script>
   <script type="text/javascript" src="/lib/js/jquery-ui.min.js"></script>
-  <script type="text/javascript" src="/js/jquery.ui.nestedSortable.js"></script>
   <script type="text/javascript" src="/lib/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="/js/jquery-cookie.js"></script>
   <script type="text/javascript" src="/js/app.js"></script>
@@ -89,64 +88,73 @@
       <strong>Success!</strong>
       <span>Your program has been loaded.</span>
     </div>
-
-    <ul id="sortable1">
-      <li class="command-container">
-        <div class="command">
-          <div class="title">SetX</div>
-          <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-          <input type="text" class="param" name="value" value="1">
+    <ul class="plain-list">
+      <li id="headerCommand" class="inverse-commmand">
+        <div class="command align-center">
+          <div class="title">Commands</div>
         </div>
       </li>
-      <li class="command-container">
-        <div class="command">
-          <div class="title">SetY</div>
-          <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-          <input type="text" class="param" name="value" value="1">
-        </div>
-      </li>
-      <li class="command-container">
-        <div class="command">
-          <div class="title">Show</div>
-          <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-        </div>
-      </li>
-      <li class="command-container">
-        <div class="command">
-          <div class="title">Hide</div>
-          <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-        </div>
-      </li>
-      <li class="command-container">
-        <div class="command">
-          <div class="title">Move</div>
-          <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-          <input type="text" class="param" name="amount" value="1">
-        </div>
-      </li>
-      <li class="command-container">
-        <div class="command">
-          <div class="title">Costume</div>
-          <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-          <input type="text" class="param" name="id" value="1">
-        </div>
-      </li>
-      <li class="command-container">
-        <div class="command">
-          <div class="title">Bg</div>
-          <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-          <select type="text" class="param"name="id">
-            <option value="1">1</option>
-            <option value="2">2</option>
-          </select>
-        </div>
-      </li>
-      <li class="command-container">
-        <div class="command">
-          <div class="title">Repeat</div>
-          <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-          <input type="text" class="param" name="iterations" value="1">
-        </div>
+      <li class="align-center">
+        <ul id="sortable1">
+          <li class="template-command-container">
+            <div class="command">
+              <div class="title">SetX</div>
+              <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+              <input type="text" class="param" name="value" value="1">
+            </div>
+          </li>
+          <li class="template-command-container">
+            <div class="command">
+              <div class="title">Repeat</div>
+              <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+              <input type="text" class="param" name="iterations" value="1">
+              <div class="command-container connected-sortable hide"></div>
+            </div>
+          </li>
+          <li class="template-command-container">
+            <div class="command">
+              <div class="title">Show</div>
+              <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+            </div>
+          </li>
+          <li class="template-command-container">
+            <div class="command">
+              <div class="title">Costume</div>
+              <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+              <input type="text" class="param" name="id" value="1">
+            </div>
+          </li>
+          <li class="template-command-container">
+            <div class="command">
+              <div class="title">Move</div>
+              <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+              <input type="text" class="param" name="amount" value="1">
+            </div>
+          </li>
+          <li class="template-command-container">
+            <div class="command">
+              <div class="title">SetY</div>
+              <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+              <input type="text" class="param" name="value" value="1">
+            </div>
+          </li>
+          <li class="template-command-container">
+            <div class="command">
+              <div class="title">Hide</div>
+              <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+            </div>
+          </li>
+          <li class="template-command-container">
+            <div class="command">
+              <div class="title">Bg</div>
+              <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+              <select type="text" class="param"name="id">
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+            </div>
+          </li>
+        </ul>
       </li>
     </ul>
 

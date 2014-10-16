@@ -7,19 +7,23 @@
 }
 
 #sortable1, #sortable2 {
-  border: 1px solid #bbb;
-  width: 200px;
+  border: 3px solid #000;
+  width: 150px;
   min-height: 20px;
   list-style-type: none;
   margin: 0;
-  padding: 5px 0 0 0;
+  padding: 0 0 0 0;
   float: left;
-  margin-right: 10px;
+}
+
+#sortable1 {
+  width: 100%;
+  z-index: 110;
 }
 
 #sortable2 {
   min-height: 400px;
-  width: 500px;
+  width: 250px;
 }
 
 #sortable1 > .place-holder {
@@ -34,9 +38,27 @@
   border: thin #ccc solid;
   cursor: move;
   font-size: 1.2em;
-  height: 45px;
-  margin: 0 5px 5px 5px;
+  min-height: 45px;
   padding: 5px;
+}
+
+.template-command-container {
+  border: thin #ccc solid;
+  cursor: move;
+  display: inline-block;
+  font-size: 1.2em;
+  height: 45px;
+  margin: 3px 2px;
+  padding: 5px;
+  width: 24%;
+  z-index: 100;
+}
+
+#headerCommand {
+  background-color: black;
+  color: white;
+  font-size: 1.2em;
+  padding: 2px;
 }
 
 .remove-command {
@@ -46,21 +68,21 @@
   top:7px;
 }
 
-  .remove-command:active {
-    font-size: 13px;
-    color: red;
-  }
+.remove-command:active {
+  font-size: 13px;
+  color: red;
+}
 
 .feedback-area{
   border: 1px solid #000;
   position: relative;
-top: 10px;
-left: 10px;
+  top: 10px;
+  left: 10px;
   width: 420px;
   height: 420px;
   list-style-type: none;
   margin: 0;
-  padding: 5px 0 0 0;
+  padding: 0 0 0 0;
   float: left;
 }
 
@@ -77,4 +99,12 @@ left: 10px;
   position: relative;
   top: 150px;
   left: 150px;
+}
+
+.align-center {
+  text-align: center;
+}
+
+.plain-list {
+  padding: 0;
 }
