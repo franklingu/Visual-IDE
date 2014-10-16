@@ -43,20 +43,9 @@ $(function() {
 
     $('#playButton').on('click', function() {
         var obj = getSequenceJson();
-
-        $.each(obj.data, function(index) {
-            var commandName;
-            var params = [];
-            $.each(obj.data[index], function(k, v) {
-                if (k == "title") {
-                    commandName = v;
-                } else {
-                    params.push(v);
-                }
-            });
-
-            updateSprite(commandName, params);
-        });
+        $('#playButton').prop('disabled', true);
+        executeCommands(obj.data);
+        $('#playButton').prop('disabled', false);
     });
 
     $('.save-title').on('click', function() {
@@ -193,36 +182,40 @@ var getSequenceJson = function() {
     return obj;
 };
 
-var updateSprite = function(commandName, params) {
+var executeCommands = function(commands) {
+    $.each(commands, function(index) {
+        executeSingleCommand(commands[index]);
+    });
+}
+
+var executeSingleCommand = function(command) {
+    var commandName = command['title'];
     switch (commandName) {
         case "SetX":
-            setX(params[0]);
+            setX(command);
             break;
-
         case "SetY":
-        console.log("sety");
-            setY(params[0]);
+            setY(command);
             break;
-
         case "Show":
-            $(".sprite").fadeTo("fast", 1);
+            show(command);
             break;
-
         case "Hide":
-            $(".sprite").fadeTo("fast", 0);
+            hide(command);
             break;
-
         case "Move":
-        console.log("move");
-            move(params[0]);
+            move(command);
             break;
-
-            /* case "Bg" : changeBg(params[0]);
-             break;*/
+        case "Repeat":
+            repeat(command);
+            break;
+        default:
+            console.log("Not implemented");
+            break;
     }
 
-    function setX(x) {
-        x = 150 + parseInt(x);
+    function setX(command) {
+        x = 150 + parseInt(command['value']);
         x = x > 310 ? 310 : x;
         x = x < 0 ? 0 : x;
 
@@ -232,8 +225,8 @@ var updateSprite = function(commandName, params) {
     }
 
 
-    function setY(x) {
-        x = 150 - parseInt(x);
+    function setY(command) {
+        x = 150 - parseInt(command['value']);
         x = x > 290 ? 290 : x;
         x = x < 0 ? 0 : x;
 
@@ -242,9 +235,17 @@ var updateSprite = function(commandName, params) {
         });
     }
 
-    function move(x) {
+    function show(command) {
+        $(".sprite").fadeTo("fast", 1);
+    }
+
+    function hide(command) {
+        $(".sprite").fadeTo("fast", 0);
+    }
+
+    function move(command) {
         var curr = $('.sprite').position().left;
-        var newPos = curr + parseInt(x);
+        var newPos = curr + parseInt(command['amount']);
 
         newPos = newPos > 310 ? 310 : newPos;
         newPos = newPos < 0 ? 0 : newPos;
@@ -252,6 +253,13 @@ var updateSprite = function(commandName, params) {
         $(".sprite").animate({
             left: newPos
         });
+    }
+
+    function repeat(command) {
+        var repeatTimes = parseInt(command['iterations']);
+        for (var i = 0; i < repeatTimes; i++) {
+            executeCommands(command['commands']);
+        };
     }
 }
 
