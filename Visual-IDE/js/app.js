@@ -5,7 +5,9 @@ $(document).ready(function() {
 
 $(function() {
     var sortableUpdateHandle = function(e, ui) {
-        $(ui.item).find(".remove-command").removeClass('hide');
+        $(ui.item).removeClass('template-command-container').addClass('command-container').attr('style', '')
+                  .find(".remove-command").removeClass('hide');
+
         $(ui.item).find('.connected-sortable').removeClass('hide').sortable({
             receive: sortableReceiveHandle,
             update: sortableUpdateHandle
@@ -26,7 +28,7 @@ $(function() {
         helper: "clone",
         distance: 20,
         start: function (e, ui) {
-            ui.helper.removeClass('template-command-container');
+            ui.helper.removeClass('template-command-container ui-draggable').addClass('command-container wide');
         }
     });
 

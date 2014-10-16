@@ -35,11 +35,11 @@
 }
 
 .command-container {
-  border: thin #ccc solid;
+  border: thin #ccc solid !important;
   cursor: move;
   font-size: 1.2em;
-  min-height: 45px;
-  padding: 5px;
+  height: 45px !important;
+  padding: 5px !important;
 }
 
 .template-command-container {
@@ -107,4 +107,8 @@
 
 .plain-list {
   padding: 0;
+}
+
+.wide {
+  width: 200px !important;
 }
