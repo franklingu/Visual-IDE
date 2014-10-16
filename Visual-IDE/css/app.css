@@ -1,3 +1,7 @@
+li {
+  list-style-type: none;
+}
+
 #mainContent {
   padding-top: 70px;
 }
@@ -35,6 +39,11 @@
   min-height: 30px;
   margin-top: 20px;
   border: thin dashed #000;
+}
+
+.repeat-list > .connected-sortable {
+  min-height: 30px;
+  margin-top: 20px;
 }
 
 .title {
@@ -89,10 +98,10 @@
   margin-right: 5px;
 }
 
-  .remove-command:active {
-    font-size: 13px;
-    color: black;
-  }
+.remove-command:active {
+  font-size: 13px;
+  color: black;
+}
 
 #feedbackArea{
   border: 1px solid #000;
@@ -110,13 +119,13 @@
   color: #ede275;
 }
 
-  #playButton:hover {
-    color: #bab042;
-  }
+#playButton:hover {
+  color: #bab042;
+}
 
-  #playButton:active {
-    color: white;
-  }
+#playButton:active {
+  color: white;
+}
 
 .align-center {
   text-align: center;
@@ -131,6 +140,6 @@
   width: 200px !important;
 }
 
-  .canvas-area {
-    margin-top: 10px;
-  }
+.canvas-area {
+  margin-top: 10px;
+}

@@ -8,7 +8,8 @@ $(function() {
         $(ui.item).removeClass('template-command-container').addClass('command-container').attr('style', '')
                   .find(".remove-command").removeClass('hide');
 
-        $(ui.item).find('.connected-sortable').removeClass('hide').sortable({
+        $(ui.item).find('.repeat-list').removeClass('hide');
+        $(ui.item).find('.connected-sortable').sortable({
             receive: sortableReceiveHandle,
             update: sortableUpdateHandle
         });
@@ -78,7 +79,6 @@ $(function() {
                 $('.save-title').attr('disabled', true);
             }
         });
-
         request.done(function(res) {
             syncTitlesList(res['titles_list']);
             if (res['status'] === 'Please login first') {
@@ -114,7 +114,6 @@ $(function() {
                 $('.load-title').attr('disabled', true);
             }
         });
-
         request.done(function(res) {
             loadFromJSON(JSON.stringify(res));
             $('#saveTitleName').val(res['title']);
@@ -122,7 +121,6 @@ $(function() {
             $('.alert-success').slideDown(500).delay(2000).slideUp(500);
             $('.load-title').attr('disabled', false);
         });
-
         request.fail(function() {
             $('.alert-danger').children('span').html('An internal error occurred. Please try again later.');
             $('.alert-danger').slideDown(500).delay(2000).slideUp(500);
@@ -166,6 +164,34 @@ $(function() {
         $.cookie("obj", JSON.stringify(obj));
     });
 });
+
+var getSequenceJson = function() {
+    function insertCommand(elem, obj) {
+        var command = {};
+        command['title'] = $(elem).find(".title").html();
+
+        var params = $(elem).find(".param");
+        params.each(function() {
+            command[$(this).attr('name')] = $(this).val();
+        });
+        if (command['title'] === 'Repeat') {
+            command['commands'] = [];
+            var subCommands = $(elem).children('.command').children('.repeat-list').children('.connected-sortable').children('li');
+            for (var i = 0; i < subCommands.length; i++) {
+                insertCommand(subCommands[i], command['commands']);
+            };
+        };
+        obj.push(command);
+    }
+    var commands = $('#sortable2').children("li");
+    var json = [];
+    for (var i = 0; i < commands.length; i++) {
+        insertCommand(commands[i], json);
+    };
+    var obj = {};
+    obj['data'] = json;
+    return obj;
+};
 
 var updateSprite = function(commandName, params) {
     switch (commandName) {
@@ -226,28 +252,8 @@ var updateSprite = function(commandName, params) {
         $(".sprite").animate({
             left: newPos
         });
-
-
     }
-
 }
-var getSequenceJson = function() {
-    var commands = $('#sortable2').find("li");
-    var json = [];
-    commands.each(function(index) {
-        var command = {};
-        command['title'] = $(this).find(".title").html();
-
-        var params = $(this).find(".param");
-        params.each(function() {
-            command[$(this).prop('name')] = $(this).val();
-        });
-        json.push(command);
-    });
-    var obj = {};
-    obj['data'] = json;
-    return obj;
-};
 
 var loadFromJSON = function (objStr) {
     if (objStr) {
