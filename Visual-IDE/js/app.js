@@ -97,6 +97,16 @@ $(function() {
         return false;
     });
 
+    $('#sortable2').on('change', 'input', function() {
+        if (isNaN(parseInt($(this).val()))) {
+            // feedback to user with words and current inputbox highlighted in red
+            console.log('invalid input');
+        } else {
+            var obj = getSequenceJson();
+            $.cookie('cachedProject', JSON.stringify(obj));
+        }
+    });
+
     $('#load-titles-list').on('click', '.load-project', function() {
         var obj = {
             'project_title': $(this).html()
@@ -138,7 +148,6 @@ $(function() {
                 $('.remove-project').attr('disabled', true);
             }
         });
-
         request.done(function(res) {
             syncTitlesList(res['titles_list']);
             $('#saveTitleName').val('');
@@ -146,7 +155,6 @@ $(function() {
             $('.alert-success').slideDown(500).delay(2000).slideUp(500);
             $('.remove-project').attr('disabled', false);
         });
-
         request.fail(function() {
             $('.alert-danger').children('span').html('An internal error occurred. Please try again later.');
             $('.alert-danger').slideDown(500).delay(2000).slideUp(500);
