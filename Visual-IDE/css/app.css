@@ -104,15 +104,17 @@ li {
 }
 
 #feedbackArea{
+  position: relative;
   border: 1px solid #000;
   height: 500px;
   padding: 0;
 }
 
 .sprite{
-  position: relative;
-  top: 150px;
-  left: 150px;
+ display: block;
+position: relative;
+top: 35%;
+left: 40%;
 }
 
 #playButton {

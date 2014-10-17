@@ -1,3 +1,8 @@
+var spriteCentreX = 350;
+var spriteCentreY = 175;
+var spriteMaxX = 765;
+var spriteMaxY = 372;
+var commandQueue = [];
 $(document).ready(function() {
     var objStr = $.cookie('cachedProject');
     loadFromJSON(objStr);
@@ -6,7 +11,7 @@ $(document).ready(function() {
 $(function() {
     var sortableUpdateHandle = function(e, ui) {
         $(ui.item).removeClass('template-command-container').addClass('command-container').attr('style', '')
-                  .find(".remove-command").removeClass('hide');
+            .find(".remove-command").removeClass('hide');
 
         $(ui.item).find('.repeat-list').removeClass('hide');
         $(ui.item).find('.connected-sortable').sortable({
@@ -26,7 +31,7 @@ $(function() {
         forcePlaceholderSize: false,
         helper: "clone",
         distance: 20,
-        start: function (e, ui) {
+        start: function(e, ui) {
             ui.helper.removeClass('template-command-container ui-draggable').addClass('command-container wide');
         }
     });
@@ -36,13 +41,17 @@ $(function() {
         update: sortableUpdateHandle
     });
 
-    $(".sprite").draggable({containment: "parent"});
+    $(".sprite").draggable({
+        containment: "parent"
+    });
     $("#feedbackArea").droppable();
 
     $('#playButton').on('click', function() {
         var obj = getSequenceJson();
         $('#playButton').prop('disabled', true);
-        executeCommands(obj.data);
+        //executeCommands(obj.data);
+        createCommandQueue(obj.data);
+        executeNextCommand();
         $('#playButton').prop('disabled', false);
     });
 
@@ -180,13 +189,31 @@ var getSequenceJson = function() {
     return obj;
 };
 
-var executeCommands = function(commands) {
+var createCommandQueue = function(commands) {
+
     $.each(commands, function(index) {
-        executeSingleCommand(commands[index]);
+        var commandName = commands[index]['title'];
+        if (commandName === "Repeat") {
+            var repeatTimes = parseInt(commands[index]['iterations']);
+            for (var i = 0; i < repeatTimes; i++) {
+                createCommandQueue(commands[index]['commands']);
+            }
+
+
+        } else {
+            commandQueue.push(commands[index]);
+
+        }
+
     });
 }
+var executeNextCommand = function() {
+    var nextCommand = commandQueue.shift();
+    if (nextCommand)
+        execute(nextCommand);
+}
 
-var executeSingleCommand = function(command) {
+var execute = function(command) {
     var commandName = command['title'];
     switch (commandName) {
         case "SetX":
@@ -204,64 +231,62 @@ var executeSingleCommand = function(command) {
         case "Move":
             move(command);
             break;
-        case "Repeat":
-            repeat(command);
-            break;
         default:
             console.log("Not implemented");
             break;
     }
 
     function setX(command) {
-        x = 150 + parseInt(command['value']);
-        x = x > 310 ? 310 : x;
+        x = spriteCentreX + parseInt(command['value']);
+        x = x > spriteMaxX ? spriteMaxX : x;
         x = x < 0 ? 0 : x;
 
         $(".sprite").animate({
             left: x
+        }, function() {
+            executeNextCommand();
         });
     }
 
 
     function setY(command) {
-        x = 150 - parseInt(command['value']);
-        x = x > 290 ? 290 : x;
+        x = spriteCentreY - parseInt(command['value']);
+        x = x > spriteMaxY ? spriteMaxY : x;
         x = x < 0 ? 0 : x;
 
         $(".sprite").animate({
             top: x
+        }, function() {
+            executeNextCommand();
         });
     }
 
     function show(command) {
         $(".sprite").fadeTo("fast", 1);
+        executeNextCommand();
     }
 
     function hide(command) {
         $(".sprite").fadeTo("fast", 0);
+        executeNextCommand();
     }
 
     function move(command) {
         var curr = $('.sprite').position().left;
         var newPos = curr + parseInt(command['amount']);
 
-        newPos = newPos > 310 ? 310 : newPos;
+        newPos = newPos > spriteMaxX ? spriteMaxX : newPos;
         newPos = newPos < 0 ? 0 : newPos;
 
         $(".sprite").animate({
             left: newPos
+        }, function() {
+            executeNextCommand();
         });
-    }
-
-    function repeat(command) {
-        var repeatTimes = parseInt(command['iterations']);
-        for (var i = 0; i < repeatTimes; i++) {
-            executeCommands(command['commands']);
-        };
     }
 }
 
-var loadFromJSON = function (objStr) {
+var loadFromJSON = function(objStr) {
     if (objStr) {
         $('#sortable2').empty();
         var commands = JSON.parse(objStr);
