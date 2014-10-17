@@ -167,6 +167,16 @@ $(function() {
         var obj = getSequenceJson();
         $.cookie('cachedProject', JSON.stringify(obj));
     });
+
+    $('body').on('blur', '.param', function() {
+        if (isNaN($(this).val())) {
+            alert('please enter a number in the parameter box!');
+            $(this).val('1');
+        } else {
+            // just substitute the number with its integer value
+            $(this).val(parseInt($(this).val()));
+        }
+    });
 });
 
 var getSequenceJson = function() {
