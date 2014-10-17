@@ -157,9 +157,9 @@ $(function() {
 var getSequenceJson = function() {
     function insertCommand(elem, obj) {
         var command = {};
-        command['title'] = $(elem).find(".title").html();
+        command['title'] = $(elem).children('.command').children(".title").html();
 
-        var params = $(elem).find(".param");
+        var params = $(elem).children('.command').children('.param');
         params.each(function() {
             command[$(this).attr('name')] = $(this).val();
         });
@@ -266,32 +266,39 @@ var executeSingleCommand = function(command) {
 var loadFromJSON = function (objStr) {
     if (objStr) {
         $('#sortable2').empty();
-        objStr = JSON.parse(objStr);
+        var commands = JSON.parse(objStr);
+        var container = $('#sortable2');
+        loadCommands(commands.data, container);
 
-        function loadJSONData(obj) {
-            $.each(obj, function(index) {
-                var listElement = $('<li>').addClass('ui-state-default command-container');
-                var command = $('<div>').addClass('command');
-                $.each(obj[index], function(k, v) {
-                    if (k == "title") {
-                        var commandName = $('<div>').addClass(k).text(v);
-                        var removeCommand = $('<span>').addClass("glyphicon glyphicon-remove pull-right remove-command");
-                        command.append(commandName);
-                        command.append(removeCommand);
-                    } else {
-                        var param = $('<input>').attr('type', 'text')
-                            .addClass('param').attr('name', k)
-                            .attr('value', v);
-                        command.append(param);
-                    }
-                });
-
-                listElement.append(command);
-                $('#sortable2').append(listElement);
-            });
+        function loadCommands(commands, container) {
+            for (var i = 0; i < commands.length; i++) {
+                var listElem = $('<li>').addClass('ui-state-default command-container');
+                var commandElem = $('<div>').addClass('command');
+                recoverCommandNode(commands[i], commandElem);
+                listElem.append(commandElem);
+                container.append(listElem);
+            };
         }
 
-        loadJSONData(objStr.data);
+        function recoverCommandNode(command, commandElem) {
+            $.each(command, function(k, v) {
+                if (k === 'title') {
+                    var commandName = $('<div>').addClass(k).text(v);
+                    var removeCommand = $('<span>').addClass("glyphicon glyphicon-remove pull-right remove-command");
+                    commandElem.append(commandName);
+                    commandElem.append(removeCommand);
+                } else if (k === 'commands') {
+                    var repeatListElem = $('<div>').addClass('repeat-list');
+                    var ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
+                    loadCommands(v, ulListElem);
+                    repeatListElem.append(ulListElem);
+                    commandElem.append(repeatListElem);
+                } else {
+                    var paramElem = $('<input>').attr('type', 'text').addClass('param').attr('name', k).attr('value', v);
+                    commandElem.append(paramElem);
+                }
+            });
+        }
     }
 };
 
