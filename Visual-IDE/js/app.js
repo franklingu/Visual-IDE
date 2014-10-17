@@ -312,12 +312,12 @@ var loadFromJSON = function(objStr) {
         }
 
         function recoverCommandNode(command, commandElem) {
+            var removeCommand = $('<span>').addClass("glyphicon glyphicon-remove pull-right remove-command");
+            commandElem.append(removeCommand);
             $.each(command, function(k, v) {
                 if (k === 'title') {
                     var commandName = $('<div>').addClass(k).text(v);
-                    var removeCommand = $('<span>').addClass("glyphicon glyphicon-remove pull-right remove-command");
                     commandElem.append(commandName);
-                    commandElem.append(removeCommand);
                 } else if (k === 'commands') {
                     var repeatListElem = $('<div>').addClass('repeat-list');
                     var ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
