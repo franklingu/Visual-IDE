@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    var objStr = $.cookie("obj");
+    var objStr = $.cookie('cachedProject');
     loadFromJSON(objStr);
 });
 
@@ -14,13 +14,11 @@ $(function() {
             update: sortableUpdateHandle
         });
         var obj = getSequenceJson();
-        $.cookie("obj", JSON.stringify(obj));
+        $.cookie('cachedProject', JSON.stringify(obj));
     };
 
     var sortableReceiveHandle = function(e, ui) {
         copyHelper = null;
-        var obj = getSequenceJson();
-        $.cookie("obj", JSON.stringify(obj));
     };
 
     $("#sortable1").find("li").draggable({
@@ -71,7 +69,7 @@ $(function() {
         request.done(function(res) {
             syncTitlesList(res['titles_list']);
             if (res['status'] === 'Please login first') {
-                $.cookie("obj", JSON.stringify(obj));
+                $.cookie('cachedProject', JSON.stringify(obj));
                 $('.alert-danger').children('span').html('Please login before saving your work.');
                 $('.alert-danger').slideDown(500).delay(2000).slideUp(500);
             } else {
@@ -81,7 +79,7 @@ $(function() {
             $('.save-title').attr('disabled', false);
         });
         request.fail(function() {
-            $.cookie("obj", JSON.stringify(obj));
+            $.cookie('cachedProject', JSON.stringify(obj));
             $('.alert-danger').children('span').html('An internal error occurred. Please try again later.');
             $('.alert-danger').slideDown(500).delay(2000).slideUp(500);
             $('.save-title').attr('disabled', false);
@@ -150,7 +148,7 @@ $(function() {
     $('body').on('click', '.remove-command', function() {
         $(this).closest('.command-container').remove();
         var obj = getSequenceJson();
-        $.cookie("obj", JSON.stringify(obj));
+        $.cookie('cachedProject', JSON.stringify(obj));
     });
 });
 
