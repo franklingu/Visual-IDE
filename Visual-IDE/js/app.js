@@ -47,17 +47,13 @@ $(function() {
     });
 
     //create options for change-bg and change-costume
-    var changeBgCommand = $(".change-bg");
+    var changeBgCommand = $(".template-command-container .change-bg");
     for (var i = 0; i <= 5; i++) {
-        var option;
-        if (i == 0)
-            option = $('<option>').attr('value', 0).html("None");
-        else
-            option = $('<option>').html(i);
+        var option = $('<option>').html(i);
         changeBgCommand.append(option);
     }
 
-    var changeCostumeCommand = $(".change-costume");
+    var changeCostumeCommand = $(".template-command-container .change-costume");
     for (var i = 1; i <= 8; i++) {
         var option = $('<option>').html(i);
         changeCostumeCommand.append(option);
@@ -318,7 +314,6 @@ var execute = function(command) {
         var id = command['id'];
         var sprite = $('.sprite');
 
-
         var imagePath = '/img/cat_' + id + '.png';
         sprite.attr('src', imagePath);
         executeNextCommand();
@@ -361,19 +356,44 @@ var loadFromJSON = function(objStr) {
         }
 
         function recoverCommandNode(command, commandElem) {
-        var removeCommand = $('<span>').addClass("glyphicon glyphicon-remove pull-right remove-command");
-        commandElem.append(removeCommand);
-        var commandName = $('<div>').addClass("title").text(command["title"]);
-        commandElem.append(commandName);
-        $.each(command, function(k, v) {
-            if (k === 'title') {
-                // skip
+            var removeCommand = $('<span>').addClass("glyphicon glyphicon-remove pull-right remove-command");
+            commandElem.append(removeCommand);
+            var commandName = $('<div>').addClass("title").text(command["title"]);
+            commandElem.append(commandName);
+            $.each(command, function(k, v) {
+                if (k === 'title') {
+                    // skip
                 } else if (k === 'commands') {
                     var repeatListElem = $('<div>').addClass('repeat-list');
                     var ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
                     loadCommands(v, ulListElem);
                     repeatListElem.append(ulListElem);
                     commandElem.append(repeatListElem);
+                } else if (k === 'id') {
+                    if (command['title'] === 'Bg') {
+                        var changeBgCommand = $('<select>').addClass('param change-bg').attr('name', k);
+                        var value = parseInt(v) || 0;
+                        for (var i = 0; i <= 5; i++) {
+                            var option = $('<option>').html(i);
+                            if (value === i) {
+                                option.attr('selected', 'selected');
+                            }
+                            changeBgCommand.append(option);
+                        }
+                        commandElem.append(changeBgCommand);
+                    } 
+                    if (command['title'] === 'Costume') {
+                        var changeCostumeCommand = $('<select>').addClass('param change-costume').attr('name', k);
+                        var value = parseInt(v) || 0;
+                        for (var i = 1; i <= 8; i++) {
+                            var option = $('<option>').html(i);
+                            if (value === i) {
+                                option.attr('selected', 'selected');
+                            };
+                            changeCostumeCommand.append(option);
+                        }
+                        commandElem.append(changeCostumeCommand);
+                    }
                 } else {
                     var paramElem = $('<input>').attr('type', 'text').addClass('param').attr('name', k).attr('value', v);
                     commandElem.append(paramElem);
