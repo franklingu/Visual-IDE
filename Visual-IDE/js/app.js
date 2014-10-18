@@ -234,31 +234,21 @@ var executeNextCommand = function() {
 
 var execute = function(command) {
     var commandName = command['title'];
-    switch (commandName) {
-        case "SetX":
-            setX(command);
-            break;
-        case "SetY":
-            setY(command);
-            break;
-        case "Show":
-            show(command);
-            break;
-        case "Hide":
-            hide(command);
-            break;
-        case "Move":
-            move(command);
-            break;
-        case "Bg":
-            changeBg(command);
-            break;
-        case "Costume":
-            changeCostume(command);
-            break;
-        default:
-            console.log("Not implemented");
-            break;
+    var commandFactory = {
+        'SetX': setX,
+        'SetY': setY,
+        'Show': show,
+        'Hide': hide,
+        'Move': move,
+        'Bg': changeBg,
+        'Costume': changeCostume
+    };
+
+    var commandExecutor = commandFactory[commandName];
+    if (commandExecutor) {
+        commandExecutor(command);
+    } else {
+        console.log('Not implemented');
     }
 
     function setX(command) {
