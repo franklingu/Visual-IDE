@@ -64,6 +64,7 @@ li {
   font-size: 14px;
   min-height: 45px !important;
   padding: 5px !important;
+  background-color: #fff;
 }
 
 .template-command-container {
@@ -141,6 +142,9 @@ li {
 
 .wide {
   width: 200px !important;
+  z-index: 20;
+  background-color: #fff;
+  opacity: 0.9;
 }
 
 .canvas-area {

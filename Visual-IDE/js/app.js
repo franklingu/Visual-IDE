@@ -279,7 +279,7 @@
         }
 
         function setX(command) {
-            x = spriteCentreX + parseInt(command['value']);
+           var x = spriteCentreX + parseInt(command['value']);
             x = x > spriteMaxX ? spriteMaxX : x;
             x = x < 0 ? 0 : x;
 
@@ -292,7 +292,7 @@
 
 
         function setY(command) {
-            x = spriteCentreY - parseInt(command['value']);
+           var x = spriteCentreY - parseInt(command['value']);
             x = x > spriteMaxY ? spriteMaxY : x;
             x = x < 0 ? 0 : x;
 
@@ -304,13 +304,17 @@
         }
 
         function show(command) {
-            $(".sprite").fadeTo("fast", 1);
-            executeNextCommand();
+            $(".sprite").fadeTo("fast", 1, function(){
+                executeNextCommand();
+            });
+            
         }
 
         function hide(command) {
-            $(".sprite").fadeTo("fast", 0);
-            executeNextCommand();
+            $(".sprite").fadeTo("fast", 0, function(){
+                 executeNextCommand(); 
+            });
+          
         }
 
         function move(command) {
@@ -329,31 +333,34 @@
 
         function changeCostume(command) {
             var id = command['id'];
-            var sprite = $('.sprite');
-
-
             var imagePath = '/img/cat_' + id + '.png';
+
+            var sprite = $('.sprite');
+            sprite.css('display', 'hidden');          
             sprite.attr('src', imagePath);
-            executeNextCommand();
+            sprite.fadeIn('fast', function(){
+                executeNextCommand();
+            });
+            
         }
 
         function changeBg(command) {
             var id = command['id'];
-            console.log(id);
-            var bgImage = $('.bg-image');
-            if (id == 0)
-                bgImage.remove();
+            var currBg = $('.bg-image');
+            if (id == 0){
+                currBg.fadeOut("fast", function(){
+                    executeNextCommand();
+                });               
+            }
             else {
                 var imagePath = '/img/bg_' + id + '.jpg';
-
-                if (bgImage.length == 0) {
-                    $('#feedbackArea').append($('<img>').addClass('bg-image').attr('src', imagePath));
-                } else {
-                    bgImage.attr('src', imagePath);
+                currBg.css('display', 'hidden');
+                currBg.attr('src', imagePath);
+                $(".bg-image").fadeIn("fast", function(){
+                    executeNextCommand();
+                    });
                 }
             }
-            executeNextCommand();
-        }
     }
 
     var loadFromJSON = function(objStr) {
