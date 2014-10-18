@@ -278,7 +278,7 @@ $(function() {
             }
           } else {
             var paramElem = $('<input>').attr('type', 'text').addClass('param').attr('name', k).attr('value', v);
-            commandElem.append(paramElem);
+            removeCommand.after(paramElem);
           }
         });
       }
