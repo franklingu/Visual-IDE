@@ -252,26 +252,24 @@ var execute = function(command) {
     }
 
     function setX(command) {
-        x = spriteCentreX + parseInt(command['value']);
+        var value = parseInt(command['value']) || 0;
+        var x = spriteCentreX + value;
         x = x > spriteMaxX ? spriteMaxX : x;
         x = x < 0 ? 0 : x;
 
-        $(".sprite").animate({
-            left: x
-        }, function() {
+        $(".sprite").animate({left: x}, function() {
             executeNextCommand();
         });
     }
 
 
     function setY(command) {
-        x = spriteCentreY - parseInt(command['value']);
+        var value = parseInt(command['value']) || 0;
+        var x = spriteCentreY - value;
         x = x > spriteMaxY ? spriteMaxY : x;
         x = x < 0 ? 0 : x;
 
-        $(".sprite").animate({
-            top: x
-        }, function() {
+        $(".sprite").animate({top: x}, function() {
             executeNextCommand();
         });
     }
@@ -293,9 +291,7 @@ var execute = function(command) {
         newPos = newPos > spriteMaxX ? spriteMaxX : newPos;
         newPos = newPos < 0 ? 0 : newPos;
 
-        $(".sprite").animate({
-            left: newPos
-        }, function() {
+        $(".sprite").animate({left: newPos}, function() {
             executeNextCommand();
         });
     }
