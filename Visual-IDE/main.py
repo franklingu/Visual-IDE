@@ -2,7 +2,6 @@ import webapp2
 import jinja2
 import os
 import json
-import logging
 from google.appengine.api import users
 from Model.models import DbManager
 
@@ -62,7 +61,6 @@ class IndexHandler(BaseHanlder):
 
 class SaveProjectHandler(BaseHanlder):
     def post(self):
-        logging.info(self.request.POST)
         title = self.request.POST.get('project_title')
         content = self.request.POST.get('project_content')
         if title is None or content is None:

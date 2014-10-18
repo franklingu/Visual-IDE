@@ -1,5 +1,4 @@
 from google.appengine.ext import db
-import logging
 
 
 class SavedProject(db.Model):
@@ -14,7 +13,7 @@ class DbManager(object):
         super(DbManager, self).__init__()
 
     @classmethod
-    def get_saved_project_titles_for_user(self, user_email):
+    def get_saved_project_titles_for_user(cls, user_email):
         if user_email is None:
             return None
         query_results = db.GqlQuery("SELECT * FROM SavedProject WHERE user_email = :1", user_email)
@@ -24,7 +23,7 @@ class DbManager(object):
         return titles_list
 
     @classmethod
-    def get_saved_project_for_user(self, user_email, project_title):
+    def get_saved_project_for_user(cls, user_email, project_title):
         if user_email is None or project_title is None:
             return None
         query_results = db.GqlQuery("SELECT * FROM SavedProject WHERE user_email = :1 AND project_title = :2",
@@ -32,7 +31,7 @@ class DbManager(object):
         return query_results
 
     @classmethod
-    def save_project(self, user_email, project_title, project_content):
+    def save_project(cls, user_email, project_title, project_content):
         if user_email is None or project_title is None or project_content is None:
             return False
         query_result = db.GqlQuery("SELECT * FROM SavedProject WHERE user_email = :1 AND project_title = :2",
@@ -49,7 +48,7 @@ class DbManager(object):
         return True
 
     @classmethod
-    def delete_project(self, user_email, project_title):
+    def delete_project(cls, user_email, project_title):
         if user_email is None or project_title is None:
             return False
         query_results = db.GqlQuery("SELECT * FROM SavedProject WHERE user_email = :1 AND project_title = :2",
