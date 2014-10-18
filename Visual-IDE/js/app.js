@@ -30,24 +30,6 @@ $(function() {
  ****************************************************/
 $(function() {
 
-  var sortableReceiveHandle = function(e, ui) {
-    copyHelper = null;
-  };
-
-  var sortableUpdateHandle = function(e, ui) {
-    $(ui.item).removeClass('template-command-container').addClass('command-container').attr('style', '')
-      .find(".remove-command").removeClass('hide');
-
-    $(ui.item).find('.repeat-list').removeClass('hide');
-    $(ui.item).find('.connected-sortable').sortable({
-      receive: sortableReceiveHandle,
-      update: sortableUpdateHandle
-    });
-    var obj = getSequenceJson();
-    $.cookie('cachedProject', JSON.stringify(obj));
-  };
-
-
   $("#sortable1").find("li").draggable({
     connectToSortable: ".connected-sortable",
     forcePlaceholderSize: false,
@@ -262,6 +244,10 @@ $(function() {
           } else if (k === 'commands') {
             var repeatListElem = $('<div>').addClass('repeat-list');
             var ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
+            ulListElem.sortable({
+                receive: sortableReceiveHandle,
+                update: sortableUpdateHandle
+            });
             loadCommands(v, ulListElem);
             repeatListElem.append(ulListElem);
             commandElem.append(repeatListElem);
@@ -442,4 +428,21 @@ var getSequenceJson = function() {
   var obj = {};
   obj['data'] = json;
   return obj;
+};
+
+var sortableReceiveHandle = function(e, ui) {
+    copyHelper = null;
+  };
+
+var sortableUpdateHandle = function(e, ui) {
+    $(ui.item).removeClass('template-command-container').addClass('command-container').attr('style', '')
+      .find(".remove-command").removeClass('hide');
+
+    $(ui.item).find('.repeat-list').removeClass('hide');
+    $(ui.item).find('.connected-sortable').sortable({
+      receive: sortableReceiveHandle,
+      update: sortableUpdateHandle
+    });
+    var obj = getSequenceJson();
+    $.cookie('cachedProject', JSON.stringify(obj));
 };
