@@ -85,6 +85,9 @@ $(function() {
  *********************/
 var startCommandExecution = function(commands) {
     if (commands.length > 0) {
+        commands['executeNext'] = function () {
+            console.log('Done with execution');
+        };
         execute(commands[0], commands, 0);
     }
 }
@@ -118,10 +121,10 @@ var execute = function(command, commands, idx) {
         $(".sprite").animate({
             left: x
         }, function() {
-            if (idx + 1 >= commands.length) {
-                console.log('Done execution');
-            } else {
+            if (idx + 1 < commands.length) {
                 execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
             }
         });
     }
@@ -138,13 +141,19 @@ var execute = function(command, commands, idx) {
         }, function() {
             if (idx + 1 < commands.length) {
                 execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
             }
         });
     }
 
     function show(command, commands, idx) {
         $(".sprite").fadeTo("fast", 1, function() {
-            execute(commands[idx + 1], commands, idx + 1);
+            if (idx + 1 < commands.length) {
+                execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
+            }
         });
     }
 
@@ -152,6 +161,8 @@ var execute = function(command, commands, idx) {
         $(".sprite").fadeTo("fast", 0, function() {
             if (idx + 1 < commands.length) {
                 execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
             }
         });
     }
@@ -168,6 +179,8 @@ var execute = function(command, commands, idx) {
         }, function() {
             if (idx + 1 < commands.length) {
                 execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
             }
         });
     }
@@ -182,6 +195,8 @@ var execute = function(command, commands, idx) {
         sprite.fadeIn('fast', function() {
             if (idx + 1 < commands.length) {
                 execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
             }
         });
     }
@@ -193,6 +208,8 @@ var execute = function(command, commands, idx) {
             currBg.fadeOut("fast", function() {
                 if (idx + 1 < commands.length) {
                     execute(commands[idx + 1], commands, idx + 1);
+                } else {
+                    commands.executeNext();
                 }
             });
         } else {
@@ -202,20 +219,36 @@ var execute = function(command, commands, idx) {
             $(".bg-image").fadeIn("fast", function() {
                 if (idx + 1 < commands.length) {
                     execute(commands[idx + 1], commands, idx + 1);
+                } else {
+                    commands.executeNext();
                 }
             });
         }
     }
 
     function repeat(command, commands, idx) {
-        if (command['commands'].length > 0) {
-            var repeatTimes = parseInt(command['iterations']);
-            for (var i = 0; i < repeatTimes; i++) {
+        var repeatTimes = parseInt(command['iterations']);
+        var repeatedTimesSoFar = 0;
+        command['commands']['executeNext'] = function () {
+            repeatedTimesSoFar++;
+            if (repeatedTimesSoFar < repeatTimes) {
                 execute(command['commands'][0], command['commands'], 0);
+            } else {
+                if (idx + 1 < commands.length) {
+                    execute(commands[idx + 1], commands, idx + 1);
+                } else {
+                    commands.executeNext();
+                }
             }
-        }
-        if (idx + 1 < commands.length) {
-            execute(commands[idx + 1], commands, idx + 1);
+        };
+        if (command['commands'].length > 0) {
+            execute(command['commands'][0], command['commands'], 0);
+        } else {
+            if (idx + 1 < commands.length) {
+                execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
+            }
         }
     }
 }
