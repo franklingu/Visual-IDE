@@ -2,7 +2,6 @@ var SPRITE_CENTER_X = 350;
 var SPRITE_CENTER_Y = 175;
 var SPRITE_MAX_X = 765;
 var SPRITE_MAX_Y = 372;
-var commandQueue = [];
 
 
 /***************************************************
@@ -68,8 +67,7 @@ $(function() {
     $('#playButton').on('click', function() {
         var obj = getSequenceJson();
         $('#playButton').prop('disabled', true);
-        createCommandQueue(obj.data);
-        executeNextCommand();
+        startCommandExecution(obj.data);
         $('#playButton').prop('disabled', false);
     });
 
@@ -85,27 +83,16 @@ $(function() {
 /*********************
  * Command execution *
  *********************/
-var createCommandQueue = function(commands) {
-    $.each(commands, function(index) {
-        var commandName = commands[index]['title'];
-        if (commandName === "Repeat") {
-            var repeatTimes = parseInt(commands[index]['iterations']);
-            for (var i = 0; i < repeatTimes; i++) {
-                createCommandQueue(commands[index]['commands']);
-            }
-        } else {
-            commandQueue.push(commands[index]);
-        }
-    });
+var startCommandExecution = function(commands) {
+    if (commands.length > 0) {
+        commands['executeNext'] = function () {
+            console.log('Done with execution');
+        };
+        execute(commands[0], commands, 0);
+    }
 }
 
-var executeNextCommand = function() {
-    var nextCommand = commandQueue.shift();
-    if (nextCommand)
-        execute(nextCommand);
-}
-
-var execute = function(command) {
+var execute = function(command, commands, idx) {
     var commandName = command['title'];
     var commandFactory = {
         'SetX': setX,
@@ -113,18 +100,19 @@ var execute = function(command) {
         'Show': show,
         'Hide': hide,
         'Move': move,
+        'Costume': changeCostume,
         'Bg': changeBg,
-        'Costume': changeCostume
+        'Repeat': repeat
     };
 
     var commandExecutor = commandFactory[commandName];
     if (commandExecutor) {
-        commandExecutor(command);
+        commandExecutor(command, commands, idx);
     } else {
         console.log('Not implemented');
     }
 
-    function setX(command) {
+    function setX(command, commands, idx) {
         var value = parseInt(command['value']) || 0;
         var x = SPRITE_CENTER_X + value;
         x = x > SPRITE_MAX_X ? SPRITE_MAX_X : x;
@@ -133,12 +121,16 @@ var execute = function(command) {
         $(".sprite").animate({
             left: x
         }, function() {
-            executeNextCommand();
+            if (idx + 1 < commands.length) {
+                execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
+            }
         });
     }
 
 
-    function setY(command) {
+    function setY(command, commands, idx) {
         var value = parseInt(command['value']) || 0;
         var x = SPRITE_CENTER_Y - value;
         x = x > SPRITE_MAX_Y ? SPRITE_MAX_Y : x;
@@ -147,25 +139,35 @@ var execute = function(command) {
         $(".sprite").animate({
             top: x
         }, function() {
-            executeNextCommand();
+            if (idx + 1 < commands.length) {
+                execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
+            }
         });
     }
 
-    function show(command) {
+    function show(command, commands, idx) {
         $(".sprite").fadeTo("fast", 1, function() {
-            executeNextCommand();
+            if (idx + 1 < commands.length) {
+                execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
+            }
         });
-
     }
 
-    function hide(command) {
+    function hide(command, commands, idx) {
         $(".sprite").fadeTo("fast", 0, function() {
-            executeNextCommand();
+            if (idx + 1 < commands.length) {
+                execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
+            }
         });
-
     }
 
-    function move(command) {
+    function move(command, commands, idx) {
         var curr = $('.sprite').position().left;
         var newPos = curr + parseInt(command['amount']);
 
@@ -175,11 +177,15 @@ var execute = function(command) {
         $(".sprite").animate({
             left: newPos
         }, function() {
-            executeNextCommand();
+            if (idx + 1 < commands.length) {
+                execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
+            }
         });
     }
 
-    function changeCostume(command) {
+    function changeCostume(command, commands, idx) {
         var id = command['id'];
         var imagePath = '/img/cat_' + id + '.png';
 
@@ -187,25 +193,62 @@ var execute = function(command) {
         sprite.css('display', 'hidden');
         sprite.attr('src', imagePath);
         sprite.fadeIn('fast', function() {
-            executeNextCommand();
+            if (idx + 1 < commands.length) {
+                execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
+            }
         });
-
     }
 
-    function changeBg(command) {
+    function changeBg(command, commands, idx) {
         var id = command['id'];
         var currBg = $('.bg-image');
         if (id == 0) {
             currBg.fadeOut("fast", function() {
-                executeNextCommand();
+                if (idx + 1 < commands.length) {
+                    execute(commands[idx + 1], commands, idx + 1);
+                } else {
+                    commands.executeNext();
+                }
             });
         } else {
             var imagePath = '/img/bg_' + id + '.jpg';
             currBg.css('display', 'hidden');
             currBg.attr('src', imagePath);
             $(".bg-image").fadeIn("fast", function() {
-                executeNextCommand();
+                if (idx + 1 < commands.length) {
+                    execute(commands[idx + 1], commands, idx + 1);
+                } else {
+                    commands.executeNext();
+                }
             });
+        }
+    }
+
+    function repeat(command, commands, idx) {
+        var repeatTimes = parseInt(command['iterations']);
+        var repeatedTimesSoFar = 0;
+        command['commands']['executeNext'] = function () {
+            repeatedTimesSoFar++;
+            if (repeatedTimesSoFar < repeatTimes) {
+                execute(command['commands'][0], command['commands'], 0);
+            } else {
+                if (idx + 1 < commands.length) {
+                    execute(commands[idx + 1], commands, idx + 1);
+                } else {
+                    commands.executeNext();
+                }
+            }
+        };
+        if (command['commands'].length > 0) {
+            execute(command['commands'][0], command['commands'], 0);
+        } else {
+            if (idx + 1 < commands.length) {
+                execute(commands[idx + 1], commands, idx + 1);
+            } else {
+                commands.executeNext();
+            }
         }
     }
 }
