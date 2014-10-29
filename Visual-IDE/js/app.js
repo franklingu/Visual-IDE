@@ -3,6 +3,8 @@ var SPRITE_CENTER_Y = 175;
 var SPRITE_MAX_X = 765;
 var SPRITE_MAX_Y = 372;
 
+var shouldStopExecution = false;
+
 
 /***************************************************
  * create options for change-bg and change-costume *
@@ -67,6 +69,10 @@ $(function() {
         $('#playButton').prop('disabled', false);
     });
 
+    $('#stopButton').on('click', function() {
+        shouldStopExecution = true;
+    });
+
     $('body').on('click', '.remove-command', function() {
         $(this).closest('.command-container').remove();
         var obj = getSequenceJson();
@@ -108,9 +114,10 @@ var evalExpression = function (expression) {
 var startCommandExecution = function(commands) {
     if (commands.length > 0) {
         commands['executeNext'] = function (idx) {
-            if (idx < commands.length) {
+            if (idx < commands.length && !shouldStopExecution) {
                 execute(commands[idx], commands, idx);
             } else {
+                shouldStopExecution = false;
                 console.log('Done with execution');
             }
         };
@@ -225,11 +232,11 @@ var execute = function(command, commands, idx) {
         var repeatTimes = evalExpression(command['iterations']) || 0;
         var repeatedTimesSoFar = 0;
         command['commands']['executeNext'] = function (repeatIdx) {
-            if (repeatIdx < command['commands'].length) {
+            if (repeatIdx < command['commands'].length && !shouldStopExecution) {
                 execute(command['commands'][repeatIdx], command['commands'], repeatIdx);
             } else {
                 repeatedTimesSoFar++;
-                if (repeatedTimesSoFar < repeatTimes) {
+                if (repeatedTimesSoFar < repeatTimes && !shouldStopExecution) {
                     execute(command['commands'][0], command['commands'], 0);
                 } else {
                     commands.executeNext(idx + 1);
@@ -238,6 +245,39 @@ var execute = function(command, commands, idx) {
         };
         if (command['commands'].length > 0 && repeatTimes > 0) {
             execute(command['commands'][0], command['commands'], 0);
+        } else {
+            commands.executeNext(idx + 1);
+        }
+    }
+
+    function forever(command, commands, idx) {
+        command['commands']['executeNext'] = function (repeatIdx) {
+            if (repeatIdx < command['commands'].length && !shouldStopExecution) {
+                execute(command['commands'][repeatIdx], command['commands'], repeatIdx);
+            } else {
+                execute(command['commands'][0], command['commands'], 0);
+            }
+        };
+        if (command['commands'].length > 0) {
+            execute(command['commands'][0], command['commands'], 0);
+        } else {
+            commands.executeNext(idx + 1);
+        }
+    }
+
+    function ifElse(command, commands, idx) {
+        var rawResult = evalExpression(command['iterations']);
+        var condition = (typeof rawResult === 'boolean' && rawResult) || false;
+        var branchToTake = condition ? 'commands1' : 'commands2';
+        command[branchToTake]['executeNext'] = function (ifElseIdx) {
+            if (ifElseIdx < command[branchToTake].length && !shouldStopExecution) {
+                execute(command[branchToTake][ifElseIdx], command[branchToTake], ifElseIdx);
+            } else {
+                commands.executeNext(idx + 1);
+            }
+        };
+        if (command[branchToTake].length > 0) {
+            execute(command[branchToTake][0], command[branchToTake], 0);
         } else {
             commands.executeNext(idx + 1);
         }
