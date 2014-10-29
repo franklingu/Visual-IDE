@@ -271,9 +271,37 @@ $(function() {
                 commandElem.append(removeCommand);
                 var commandName = $('<div>').addClass("title").text(command["title"]);
                 commandElem.append(commandName);
+
+                if (command['title'] === 'If') {
+                    // handle if-branch commands list
+                    var repeatListElem = $('<div>').addClass('repeat-list').attr('id', 'ifExec');
+                    var ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
+                    ulListElem.sortable({
+                        receive: sortableReceiveHandle,
+                        update: sortableUpdateHandle
+                    });
+                    loadCommands(command['commands1'], ulListElem);
+                    repeatListElem.append(ulListElem);
+                    commandElem.append(repeatListElem);
+
+                    // write down Else
+                    var secondTitle = $('<div>').addClass('title-2').html('Else');
+                    commandElem.append(secondTitle);
+
+                    // handle else-branch commands list
+                    repeatListElem = $('<div>').addClass('repeat-list').attr('id', 'elseExec');
+                    ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
+                    ulListElem.sortable({
+                        receive: sortableReceiveHandle,
+                        update: sortableUpdateHandle
+                    });
+                    loadCommands(command['commands2'], ulListElem);
+                    repeatListElem.append(ulListElem);
+                    commandElem.append(repeatListElem);
+                }
                 $.each(command, function(k, v) {
-                    if (k === 'title') {
-                        // skip
+                    if (k === 'title' || k === 'commands1' || k === 'commands2') {
+                        // skip as they handled separately
                     } else if (k === 'commands') {
                         var repeatListElem = $('<div>').addClass('repeat-list');
                         var ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
@@ -453,9 +481,8 @@ var getSequenceJson = function() {
         } else if (command['title'] === 'If') {
             command['commands1'] = [];
             command['commands2'] = [];
-            command['title-2'] = 'Else';
-            var ifSubCommands = $(elem).children('#ifExec').children('.connected-sortable').children('li');
-            var elseSubCommands = $(elem).children('#elseExec').children('.connected-sortable').children('li');
+            var ifSubCommands = $(elem).find('#ifExec').children('.connected-sortable').children('li');
+            var elseSubCommands = $(elem).find('#elseExec').children('.connected-sortable').children('li');
 
             for (var i = 0; i < ifSubCommands.length; i++) {
                 insertCommand(ifSubCommands[i], command['commands1']);
