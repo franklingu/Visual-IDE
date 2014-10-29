@@ -21,7 +21,6 @@ $(function() {
         var option = $('<option>').html(i);
         changeCostumeCommand.append(option);
     }
-
 });
 
 
@@ -287,6 +286,14 @@ var execute = function(command, commands, idx) {
         } else {
             commands.executeNext(idx + 1);
         }
+    }
+
+    // this is async for now. and it does not seems to matter that much for now
+    // attach event to ended for aync
+    function playSound(command, commands, idx) {
+        var pinDropping = new Audio('sound/pin_dropping.mp3');
+        pinDropping.play();
+        commands.executeNext(idx + 1);
     }
 }
 

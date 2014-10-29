@@ -33,6 +33,10 @@ handlers:
   static_dir: js
   mime_type: "text/javascript"
 
+- url: /sound
+  static_dir: sound
+  mime_type: "audio/mpeg3"
+
 - url: .*
   script: main.app
 
