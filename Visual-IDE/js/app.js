@@ -51,13 +51,12 @@ $(function() {
 
     $('#sortable2').on('change', 'input', function() {
         if (!isExpressionValid($(this).val())) {
-            // logging implemented currently: need to change to tooltip.
+            // TODO: change to tooltip or also with help of red highlighting
             console.log('invalid input');
             $(this).val('1');
         } else {
             var obj = getSequenceJson();
             $.cookie('cachedProject', JSON.stringify(obj));
-            console.log(evalExpression($(this).val()));
         }
     });
 
@@ -80,7 +79,7 @@ $(function() {
 var preprocessExpression = function (expression) {
     var currX = $('.sprite').position().left;
     var currY = $('.sprite').position().top;
-    var processedExpression = expression.replace('x', currX).replace('y', currY);
+    return expression.replace('x', currX).replace('y', currY);
 };
 
 var isExpressionValid = function (expression) {
@@ -140,7 +139,7 @@ var execute = function(command, commands, idx) {
     }
 
     function setX(command, commands, idx) {
-        var value = parseInt(command['value']) || 0;
+        var value = evalExpression(command['value']) || 0;
         var x = SPRITE_CENTER_X + value;
         x = x > SPRITE_MAX_X ? SPRITE_MAX_X : x;
         x = x < 0 ? 0 : x;
@@ -179,8 +178,9 @@ var execute = function(command, commands, idx) {
     }
 
     function move(command, commands, idx) {
-        var curr = $('.sprite').position().left;
-        var newPos = curr + parseInt(command['amount']);
+        var currX = $('.sprite').position().left;
+        var moveXAmt = evalExpression(command['amount']) || 0;
+        var newPos = currX + moveXAmt;
 
         newPos = newPos > SPRITE_MAX_X ? SPRITE_MAX_X : newPos;
         newPos = newPos < 0 ? 0 : newPos;
@@ -222,7 +222,7 @@ var execute = function(command, commands, idx) {
     }
 
     function repeat(command, commands, idx) {
-        var repeatTimes = parseInt(command['iterations']);
+        var repeatTimes = evalExpression(command['iterations']) || 0;
         var repeatedTimesSoFar = 0;
         command['commands']['executeNext'] = function (repeatIdx) {
             if (repeatIdx < command['commands'].length) {
