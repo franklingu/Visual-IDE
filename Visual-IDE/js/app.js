@@ -27,7 +27,7 @@ $(function() {
  * attching object types and events to DOM elements *
  ****************************************************/
 $(function() {
-    $("#sortable1").find("li").draggable({
+    $(".commandsContainer").find("li").draggable({
         connectToSortable: ".connected-sortable",
         forcePlaceholderSize: false,
         helper: "clone",

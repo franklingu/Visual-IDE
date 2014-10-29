@@ -68,7 +68,10 @@
 
         <ul class="nav navbar-nav navbar-left" role="play">
           <li>
-            <a href="#" id="playButton">Play</a>
+            <a href="#" id="playButton" class="control-buttons">Play</a>
+          </li>
+          <li>
+            <a href="#" id="stopButton" class="control-buttons">Stop</a>
           </li>
         </ul>
 
@@ -97,77 +100,95 @@
     </div>
 
     <div class="container">
-      <div class="row">
+      <div class="row tab-content">
         <ul class="plain-list">
-          <li id="headerCommand" class="inverse-commmand">
+          <li class="inverse-commmand">
             <div class="command align-center">
-              <div class="title">Commands</div>
+              <div class="title">
+                <ul class="nav nav-tabs" role="tablist">
+                  <li class="active"><a href="#basicCommands" role="tab" data-toggle="tab">Basic</a></li>
+                  <li><a href="#advancedCommands" role="tab" data-toggle="tab">Advanced</a></li>
+                </ul>
+              </div>
             </div>
           </li>
-          <li class="align-center">
-            <ul id="sortable1">
-              <li class="template-command-container">
-                <div class="command">
-                  <div class="title">SetX</div>
-                  <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-                  <input type="text" class="param" name="value" value="1">
-                </div>
-              </li>
-              <li class="template-command-container">
-                <div class="command">
-                  <div class="title">Repeat</div>
-                  <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-                  <input type="text" class="param" name="iterations" value="1">
-                  <div class="repeat-list hide">
-                    <ul class="connected-sortable"></ul>
-                  </div>
-                </div>
-              </li>
-              <li class="template-command-container">
-                <div class="command">
-                  <div class="title">Show</div>
-                  <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-                </div>
-              </li>
-              <li class="template-command-container">
-                <div class="command">
-                  <div class="title">Costume</div>
-                  <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-                  <select class="param change-costume"name="id">
-                  </select>
-                </div>
-              </li>
-              <li class="template-command-container">
-                <div class="command">
-                  <div class="title">Move</div>
-                  <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-                  <input type="text" class="param" name="amount" value="1">
-                </div>
-              </li>
-              <li class="template-command-container">
-                <div class="command">
-                  <div class="title">SetY</div>
-                  <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-                  <input type="text" class="param" name="value" value="1">
-                </div>
-              </li>
-              <li class="template-command-container">
-                <div class="command">
-                  <div class="title">Hide</div>
-                  <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-                </div>
-              </li>
-              <li class="template-command-container">
-                <div class="command">
-                  <div class="title">Bg</div>
-                  <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
-                  <select class="param change-bg" name="id">
-                  </select>
-                </div>
-              </li>
-            </ul>
-          </li>
         </ul>
+        <div class="tab-pane fade in active" id="basicCommands">
+          <ul class="commandsContainer">
+            <li class="template-command-container">
+              <div class="command">
+                <div class="title">SetX</div>
+                <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+                <input type="text" class="param" name="value" value="1">
+              </div>
+            </li>
+            <li class="template-command-container">
+              <div class="command">
+                <div class="title">Repeat</div>
+                <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+                <input type="text" class="param" name="iterations" value="1">
+                <div class="repeat-list hide">
+                  <ul class="connected-sortable"></ul>
+                </div>
+              </div>
+            </li>
+            <li class="template-command-container">
+              <div class="command">
+                <div class="title">Show</div>
+                <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+              </div>
+            </li>
+            <li class="template-command-container">
+              <div class="command">
+                <div class="title">Costume</div>
+                <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+                <select class="param change-costume"name="id">
+                </select>
+              </div>
+            </li>
+            <li class="template-command-container">
+              <div class="command">
+                <div class="title">Move</div>
+                <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+                <input type="text" class="param" name="amount" value="1">
+              </div>
+            </li>
+            <li class="template-command-container">
+              <div class="command">
+                <div class="title">SetY</div>
+                <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+                <input type="text" class="param" name="value" value="1">
+              </div>
+            </li>
+            <li class="template-command-container">
+              <div class="command">
+                <div class="title">Hide</div>
+                <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+              </div>
+            </li>
+            <li class="template-command-container">
+              <div class="command">
+                <div class="title">Bg</div>
+                <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+                <select class="param change-bg" name="id">
+                </select>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="tab-pane fade" id="advancedCommands">
+          <ul class="commandsContainer">
+            <li class="template-command-container">
+              <div class="command">
+                <div class="title">Forever</div>
+                <span class="glyphicon glyphicon-remove pull-right hide remove-command"></span>
+                <div class="repeat-list hide">
+                  <ul class="connected-sortable"></ul>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
       <div class="row canvas-area">
         <div id="programContainer" class="col-xs-3">

@@ -10,7 +10,7 @@ li {
   font-size: 18px;
 }
 
-#sortable1, #sortable2 {
+.commandsContainer, #sortable2 {
   border: 3px solid #000;
   min-height: 20px;
   list-style-type: none;
@@ -18,7 +18,7 @@ li {
   padding: 0 0 0 0;
 }
 
-#sortable1 {
+.commandsContainer {
   width: 100%;
   z-index: 110;
 }
@@ -27,7 +27,7 @@ li {
   min-height: 480px;
 }
 
-#sortable1 > .place-holder {
+.commandsContainer > .place-holder {
   display: none;
 }
 
@@ -123,11 +123,19 @@ li {
   color: #ede275;
 }
 
+#stopButton {
+  color: #c00;
+}
+
+  #stopButton:hover {
+    color: #800;
+  }
+
 #playButton:hover {
   color: #bab042;
 }
 
-#playButton:active {
+#playButton:active, #stopButton:active {
   color: white;
 }
 
