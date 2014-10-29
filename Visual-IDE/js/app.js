@@ -449,8 +449,22 @@ var getSequenceJson = function() {
             var subCommands = $(elem).children('.command').children('.repeat-list').children('.connected-sortable').children('li');
             for (var i = 0; i < subCommands.length; i++) {
                 insertCommand(subCommands[i], command['commands']);
-            };
-        };
+            }
+        } else if (command['title'] === 'If') {
+            command['commands1'] = [];
+            command['commands2'] = [];
+            command['title-2'] = 'Else';
+            var ifSubCommands = $(elem).children('#ifExec').children('.connected-sortable').children('li');
+            var elseSubCommands = $(elem).children('#elseExec').children('.connected-sortable').children('li');
+
+            for (var i = 0; i < ifSubCommands.length; i++) {
+                insertCommand(ifSubCommands[i], command['commands1']);
+            }
+
+            for (var i = 0; i < elseSubCommands.length; i++) {
+                insertCommand(elseSubCommands[i], command['commands2']);
+            }
+        }
         obj.push(command);
     }
     var commands = $('#sortable2').children("li");
