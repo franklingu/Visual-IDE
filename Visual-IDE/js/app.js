@@ -135,7 +135,9 @@ var execute = function(command, commands, idx) {
         'Move': move,
         'Costume': changeCostume,
         'Bg': changeBg,
-        'Repeat': repeat
+        'Repeat': repeat,
+        'Forever': forever,
+        'If': ifElse
     };
 
     var commandExecutor = commandFactory[commandName];
@@ -252,7 +254,11 @@ var execute = function(command, commands, idx) {
 
     function forever(command, commands, idx) {
         command['commands']['executeNext'] = function (repeatIdx) {
-            if (repeatIdx < command['commands'].length && !shouldStopExecution) {
+            if (shouldStopExecution) {
+                shouldStopExecution = false;
+                return ;
+            }
+            if (repeatIdx < command['commands'].length) {
                 execute(command['commands'][repeatIdx], command['commands'], repeatIdx);
             } else {
                 execute(command['commands'][0], command['commands'], 0);
@@ -266,7 +272,7 @@ var execute = function(command, commands, idx) {
     }
 
     function ifElse(command, commands, idx) {
-        var rawResult = evalExpression(command['iterations']);
+        var rawResult = evalExpression(command['condition']);
         var condition = (typeof rawResult === 'boolean' && rawResult) || false;
         var branchToTake = condition ? 'commands1' : 'commands2';
         command[branchToTake]['executeNext'] = function (ifElseIdx) {
@@ -530,6 +536,12 @@ var getSequenceJson = function() {
 
             for (var i = 0; i < elseSubCommands.length; i++) {
                 insertCommand(elseSubCommands[i], command['commands2']);
+            }
+        } else if (command['title'] === 'Forever') {
+            command['commands'] = [];
+            var subCommands = $(elem).children('.command').children('.repeat-list').children('.connected-sortable').children('li');
+            for (var i = 0; i < subCommands.length; i++) {
+                insertCommand(subCommands[i], command['commands']);
             }
         }
         obj.push(command);
