@@ -8,7 +8,6 @@ var SPRITE_MAX_Y = 372;
  * create options for change-bg and change-costume *
  ***************************************************/
 $(function() {
-
     var changeBgCommand = $(".template-command-container .change-bg");
     for (var i = 0; i <= 5; i++) {
         var option = $('<option>').html(i);
@@ -28,7 +27,6 @@ $(function() {
  * attching object types and events to DOM elements *
  ****************************************************/
 $(function() {
-
     $("#sortable1").find("li").draggable({
         connectToSortable: ".connected-sortable",
         forcePlaceholderSize: false,
@@ -52,15 +50,14 @@ $(function() {
 
 
     $('#sortable2').on('change', 'input', function() {
-        if (isNaN(parseInt($(this).val()))) {
+        if (!isExpressionValid($(this).val())) {
             // logging implemented currently: need to change to tooltip.
             console.log('invalid input');
             $(this).val('1');
         } else {
-
-            $(this).val(parseInt($(this).val()));
             var obj = getSequenceJson();
             $.cookie('cachedProject', JSON.stringify(obj));
+            console.log(evalExpression($(this).val()));
         }
     });
 
@@ -78,6 +75,32 @@ $(function() {
     });
 
 });
+
+// TODO: finish this function
+var preprocessExpression = function (expression) {
+    var currX = $('.sprite').position().left;
+    var currY = $('.sprite').position().top;
+    var processedExpression = expression.replace('x', currX).replace('y', currY);
+};
+
+var isExpressionValid = function (expression) {
+    var processedExpression = preprocessExpression(expression);
+    try {
+        math.eval(processedExpression);
+        return true;
+    } catch(err) {
+        return false;
+    }
+};
+
+var evalExpression = function (expression) {
+    var processedExpression = preprocessExpression(expression);
+    try {
+        return math.eval(processedExpression);
+    } catch(err) {
+        return NaN;
+    }
+};
 
 
 /*********************
@@ -226,7 +249,6 @@ var execute = function(command, commands, idx) {
  * Loading and Saving data using AJAX calls  *
  *********************************************/
 $(function() {
-
     var loadFromJSON = function(objStr) {
         if (objStr) {
             $('#sortable2').empty();
