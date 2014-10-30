@@ -7,7 +7,7 @@ var shouldStopExecution = false;
 
 
 /***************************************************
- * create options for change-bg and change-costume *
+ * create options for change-bg and change-choice *
  ***************************************************/
 $(function() {
     var changeBgCommand = $(".template-command-container .change-bg");
@@ -16,7 +16,7 @@ $(function() {
         changeBgCommand.append(option);
     }
 
-    var changeCostumeCommand = $(".template-command-container .change-costume");
+    var changeCostumeCommand = $(".template-command-container .change-choice");
     for (var i = 1; i <= 8; i++) {
         var option = $('<option>').html(i);
         changeCostumeCommand.append(option);
@@ -379,7 +379,7 @@ $(function() {
                             commandElem.append(changeBgCommand);
                         }
                         if (command['title'] === 'Costume') {
-                            var changeCostumeCommand = $('<select>').addClass('param change-costume').attr('name', k);
+                            var changeCostumeCommand = $('<select>').addClass('param change-choice').attr('name', k);
                             var value = parseInt(v) || 0;
                             for (var i = 1; i <= 8; i++) {
                                 var option = $('<option>').html(i);
