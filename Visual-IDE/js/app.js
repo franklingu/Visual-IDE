@@ -11,7 +11,8 @@ var soundFactory = {
     4: new Audio('sound/pin_dropping.mp3'),
     5: new Audio('sound/realistic.mp3'),
     6: new Audio('sound/shells_falls.mp3'),
-    7: new Audio('sound/woosh.mp3')
+    7: new Audio('sound/tick.mp3'),
+    8: new Audio('sound/woosh.mp3')
 };
 
 
@@ -120,15 +121,16 @@ var evalExpression = function (expression) {
  * Command execution *
  *********************/
 var startCommandExecution = function(commands) {
+    commands['executeNext'] = function (idx) {
+        if (idx < commands.length && !shouldStopExecution) {
+            execute(commands[idx], commands, idx);
+        } else {
+            shouldStopExecution = false;
+            console.log('Done with execution');
+            return ;
+        }
+    };
     if (commands.length > 0) {
-        commands['executeNext'] = function (idx) {
-            if (idx < commands.length && !shouldStopExecution) {
-                execute(commands[idx], commands, idx);
-            } else {
-                shouldStopExecution = false;
-                console.log('Done with execution');
-            }
-        };
         execute(commands[0], commands, 0);
     }
 }
@@ -250,6 +252,7 @@ var execute = function(command, commands, idx) {
                 if (repeatedTimesSoFar < repeatTimes && !shouldStopExecution) {
                     execute(command['commands'][0], command['commands'], 0);
                 } else {
+                    repeatedTimesSoFar=0;
                     commands.executeNext(idx + 1);
                 }
             }
@@ -298,13 +301,14 @@ var execute = function(command, commands, idx) {
         }
     }
 
-    // this is async for now. and it does not seems to matter that much for now
-    // attach event to ended for aync
     function playSound(command, commands, idx) {
         var soundIdx = command['id'];
         var soundToPlay = soundFactory[soundIdx];
+        $(soundToPlay).on('ended', function () {
+            $(soundToPlay).unbind('ended');
+            commands.executeNext(idx + 1);
+        });
         soundToPlay.play();
-        commands.executeNext(idx + 1);
     }
 }
 
