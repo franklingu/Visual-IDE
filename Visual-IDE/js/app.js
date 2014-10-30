@@ -4,6 +4,15 @@ var SPRITE_MAX_X = 765;
 var SPRITE_MAX_Y = 372;
 
 var shouldStopExecution = false;
+var soundFactory = {
+    1: new Audio('sound/banana_slap.mp3'),
+    2: new Audio('sound/blop.mp3'),
+    3: new Audio('sound/bullet_whizzing_by.mp3'),
+    4: new Audio('sound/pin_dropping.mp3'),
+    5: new Audio('sound/realistic.mp3'),
+    6: new Audio('sound/shells_falls.mp3'),
+    7: new Audio('sound/woosh.mp3')
+};
 
 
 /***************************************************
@@ -136,7 +145,8 @@ var execute = function(command, commands, idx) {
         'Bg': changeBg,
         'Repeat': repeat,
         'Forever': forever,
-        'If': ifElse
+        'If': ifElse,
+        'Sound': playSound
     };
 
     var commandExecutor = commandFactory[commandName];
@@ -291,8 +301,9 @@ var execute = function(command, commands, idx) {
     // this is async for now. and it does not seems to matter that much for now
     // attach event to ended for aync
     function playSound(command, commands, idx) {
-        var pinDropping = new Audio('sound/pin_dropping.mp3');
-        pinDropping.play();
+        var soundIdx = command['id'];
+        var soundToPlay = soundFactory[soundIdx];
+        soundToPlay.play();
         commands.executeNext(idx + 1);
     }
 }
