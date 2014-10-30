@@ -133,7 +133,7 @@ var startCommandExecution = function(commands) {
     if (commands.length > 0) {
         execute(commands[0], commands, 0);
     }
-}
+};
 
 var execute = function(command, commands, idx) {
     var commandName = command['title'];
@@ -310,7 +310,7 @@ var execute = function(command, commands, idx) {
         });
         soundToPlay.play();
     }
-}
+};
 
 
 /*********************************************
