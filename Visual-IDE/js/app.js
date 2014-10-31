@@ -162,7 +162,7 @@ var execute = function(command, commands, idx) {
     }
 
     function setX(command, commands, idx) {
-        var value = evalExpression(command['value']) || 0;
+        var value = evalExpression(command['value']) | 0;
         var x = SPRITE_CENTER_X + value;
         x = x > SPRITE_MAX_X ? SPRITE_MAX_X : x;
         x = x < 0 ? 0 : x;
@@ -176,7 +176,7 @@ var execute = function(command, commands, idx) {
 
 
     function setY(command, commands, idx) {
-        var value = evalExpression(command['value']) || 0;
+        var value = evalExpression(command['value']) | 0;
         var x = SPRITE_CENTER_Y - value;
         x = x > SPRITE_MAX_Y ? SPRITE_MAX_Y : x;
         x = x < 0 ? 0 : x;
@@ -202,7 +202,7 @@ var execute = function(command, commands, idx) {
 
     function move(command, commands, idx) {
         var currX = $('.sprite').position().left;
-        var moveXAmt = evalExpression(command['amount']) || 0;
+        var moveXAmt = evalExpression(command['amount']) | 0;
         var newPos = currX + moveXAmt;
 
         newPos = newPos > SPRITE_MAX_X ? SPRITE_MAX_X : newPos;
@@ -216,7 +216,7 @@ var execute = function(command, commands, idx) {
     }
 
     function changeCostume(command, commands, idx) {
-        var id = parseInt(command['id']);
+        var id = evalExpression(command['id']) | 0;
         id = ((id + NUM_COSTUMES) % NUM_COSTUMES);
         var imagePath = '/img/cat_' + id + '.png';
 
@@ -229,7 +229,7 @@ var execute = function(command, commands, idx) {
     }
 
     function changeBg(command, commands, idx) {
-        var id = parseInt(command['id']);
+        var id = evalExpression(command['id']) | 0;
         id = ((id + NUM_BACKGROUNDS) % NUM_BACKGROUNDS);
         var currBg = $('.bg-image');
         if (id == 1) {
@@ -247,7 +247,7 @@ var execute = function(command, commands, idx) {
     }
 
     function repeat(command, commands, idx) {
-        var repeatTimes = evalExpression(command['iterations']) || 0;
+        var repeatTimes = evalExpression(command['iterations']) | 0;
         var repeatedTimesSoFar = 0;
         command['commands']['executeNext'] = function (repeatIdx) {
             if (repeatIdx < command['commands'].length && !shouldStopExecution) {
@@ -307,7 +307,7 @@ var execute = function(command, commands, idx) {
     }
 
     function playSound(command, commands, idx) {
-        var soundIdx = parseInt(command['id']);
+        var soundIdx = evalExpression(command['id']) || 0;
         soundIdx = ((soundIdx + NUM_SOUNDS) % NUM_SOUNDS);
         var soundToPlay = soundFactory[soundIdx];
         $(soundToPlay).on('ended', function () {
