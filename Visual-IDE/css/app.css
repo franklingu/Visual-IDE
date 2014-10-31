@@ -191,3 +191,8 @@
   margin: 0px;
   float: right;
 }
+
+.tab-pane > ul {
+  max-height: 150px;
+  overflow: auto;
+}

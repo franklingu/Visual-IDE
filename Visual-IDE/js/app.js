@@ -27,9 +27,42 @@ $(function () {
     });
 });
 
+/****************************************************
+ *** adding previews for backgrounds and costumes ***
+ ****************************************************/
+
+$(function() {
+
+    var costumesContainer = $('#costumesReference > ul');
+    var backgroundsContainer = $('#backgroundsReference > ul');
+
+    // add background images
+    for (var i = 0; i < NUM_BACKGROUNDS; i++) {
+        var preview = $('<li>');
+        var title = $('<div>').addClass('title').html('Bg ' + i);
+        var thumbnail = $('<img>').addClass('thumbnail').attr('src', '/img/bg_' + (i + 1) % NUM_BACKGROUNDS + '.jpg');
+        var value = $('<input>').attr('type', 'hidden').attr('name', 'bgid').val(i);
+
+        preview.append(title).append(thumbnail).append(value);
+        backgroundsContainer.append(preview);
+        alert(title);
+    }
+
+    for (var i = 0; i < NUM_COSTUMES; i++) {
+        var preview = $('<li>');
+        var title = $('<div>').addClass('title').html('Costume ' + i);
+        var thumbnail = $('<img>').addClass('thumbnail').attr('src', '/img/cat_' + (i + 1) % NUM_COSTUMES + '.png');
+        var value = $('<input>').attr('type', 'hidden').attr('name', 'costumeid').val(i);
+
+        preview.append(title).append(thumbnail).append(value);
+        costumesContainer.append(preview);
+        alert(value);
+    }
+});
+
 
 /****************************************************
- * attching object types and events to DOM elements *
+ * attaching object types and events to DOM elements *
  ****************************************************/
 $(function() {
     $(".commandsContainer").find("li").draggable({
@@ -84,7 +117,6 @@ $(function() {
 
 });
 
-// TODO: finish this function
 var preprocessExpression = function (expression) {
     var currX = ($('#feedbackArea .sprite').position().left - SPRITE_CENTER_X).toString();
     var currY = (SPRITE_CENTER_Y - $('.sprite').position().top).toString();
@@ -116,8 +148,8 @@ function getRotationDegrees(elem) {
 var isExpressionValid = function (expression) {
     var processedExpression = preprocessExpression(expression);
     try {
-        math.eval(processedExpression);
-        return true;
+        var evalResult = math.eval(processedExpression);
+        return !isNaN(evalResult);
     } catch(err) {
         return false;
     }
@@ -126,7 +158,7 @@ var isExpressionValid = function (expression) {
 var evalExpression = function (expression) {
     var processedExpression = preprocessExpression(expression);
     try {
-        return math.eval(processedExpression);
+        return math.eval(processedExpression) || 0;
     } catch(err) {
         return NaN;
     }
@@ -177,7 +209,7 @@ var execute = function(command, commands, idx) {
     }
 
     function setX(command, commands, idx) {
-        var value = evalExpression(command['value']) | 0;
+        var value = evalExpression(command['value']);
         var x = SPRITE_CENTER_X + value;
         x = x > SPRITE_MAX_X ? SPRITE_MAX_X : x;
         x = x < 0 ? 0 : x;
@@ -191,7 +223,7 @@ var execute = function(command, commands, idx) {
 
 
     function setY(command, commands, idx) {
-        var value = evalExpression(command['value']) | 0;
+        var value = evalExpression(command['value']);
         var x = SPRITE_CENTER_Y - value;
         x = x > SPRITE_MAX_Y ? SPRITE_MAX_Y : x;
         x = x < 0 ? 0 : x;
