@@ -27,9 +27,42 @@ $(function () {
     });
 });
 
+/****************************************************
+ *** adding previews for backgrounds and costumes ***
+ ****************************************************/
+
+$(function() {
+
+    var costumesContainer = $('#costumesReference > ul');
+    var backgroundsContainer = $('#backgroundsReference > ul');
+
+    // add background images
+    for (var i = 0; i < NUM_BACKGROUNDS; i++) {
+        var preview = $('<li>');
+        var title = $('<div>').addClass('title').html('Bg ' + i);
+        var thumbnail = $('<img>').addClass('thumbnail').attr('src', '/img/bg_' + (i + 1) % NUM_BACKGROUNDS + '.jpg');
+        var value = $('<input>').attr('type', 'hidden').attr('name', 'bgid').val(i);
+
+        preview.append(title).append(thumbnail).append(value);
+        backgroundsContainer.append(preview);
+        alert(title);
+    }
+
+    for (var i = 0; i < NUM_COSTUMES; i++) {
+        var preview = $('<li>');
+        var title = $('<div>').addClass('title').html('Costume ' + i);
+        var thumbnail = $('<img>').addClass('thumbnail').attr('src', '/img/cat_' + (i + 1) % NUM_COSTUMES + '.png');
+        var value = $('<input>').attr('type', 'hidden').attr('name', 'costumeid').val(i);
+
+        preview.append(title).append(thumbnail).append(value);
+        costumesContainer.append(preview);
+        alert(value);
+    }
+});
+
 
 /****************************************************
- * attching object types and events to DOM elements *
+ * attaching object types and events to DOM elements *
  ****************************************************/
 $(function() {
     $(".commandsContainer").find("li").draggable({
