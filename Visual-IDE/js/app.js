@@ -232,7 +232,7 @@ var execute = function(command, commands, idx) {
 
     function changeCostume(command, commands, idx) {
         var id = evalExpression(command['id']) | 0;
-        id = ((id + NUM_COSTUMES) % NUM_COSTUMES);
+        id = ((id % NUM_COSTUMES) +  NUM_COSTUMES) % NUM_COSTUMES;
         var imagePath = '/img/cat_' + id + '.png';
 
         var sprite = $('.sprite');
@@ -244,21 +244,16 @@ var execute = function(command, commands, idx) {
     }
 
     function changeBg(command, commands, idx) {
-        var id = evalExpression(command['id']) | 0;
-        id = ((id + NUM_BACKGROUNDS) % NUM_BACKGROUNDS);
-        var currBg = $('.bg-image');
-        if (id == 1) {
-            currBg.fadeOut("fast", function() {
-                commands.executeNext(idx + 1);
-            });
-        } else {
-            var imagePath = '/img/bg_' + id + '.jpg';
-            currBg.css('display', 'hidden');
-            currBg.attr('src', imagePath);
-            $(".bg-image").fadeIn("fast", function() {
-                commands.executeNext(idx + 1);
-            });
-        }
+        var id = (evalExpression(command['id']) | 0);
+        id = ((id  % NUM_BACKGROUNDS) + NUM_BACKGROUNDS) % NUM_BACKGROUNDS;
+        var currBg = $('.bg-image');       
+        var imagePath = '/img/bg_' + id + '.jpg';
+        currBg.css('display', 'hidden');
+        currBg.attr('src', imagePath);
+        $(".bg-image").fadeIn("fast", function() {
+            commands.executeNext(idx + 1);
+        });
+        
     }
 
     function repeat(command, commands, idx) {
