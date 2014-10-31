@@ -86,9 +86,9 @@ $(function() {
 
 // TODO: finish this function
 var preprocessExpression = function (expression) {
-    var currX = ($('.sprite').position().left - SPRITE_CENTER_X).toString();
+    var currX = ($('#feedbackArea .sprite').position().left - SPRITE_CENTER_X).toString();
     var currY = (SPRITE_CENTER_Y - $('.sprite').position().top).toString();
-    var currAngle = (0).toString();
+    var currAngle = (getRotationDegrees($('#feedbackArea .sprite'))).toString();
     var currSprite = $('#feedbackArea .sprite').attr('src').substr(9, 1);
     var currBg = $('#feedbackArea .bg-image').attr('src').substr(8, 1);
     var canvasHeight = SPRITE_MAX_Y.toString();
@@ -99,6 +99,19 @@ var preprocessExpression = function (expression) {
         currAngle).replace('spriteNumber', currSprite).replace('canvasHeight', canvasHeight).replace('canvasWidth',
         canvasWidth).replace('canvasBg', currBg).replace('mouseX', mouseX).replace('mouseY', mouseY);
 };
+
+function getRotationDegrees(elem) {
+    var matrix = elem.css("-webkit-transform") || elem.css("-moz-transform") || elem.css("-ms-transform") ||
+        elem.css("-o-transform") || elem.css("transform");
+    var angle = 0;
+    if(matrix !== 'none') {
+        var values = matrix.split('(')[1].split(')')[0].split(',');
+        var a = values[0];
+        var b = values[1];
+        angle = Math.round(Math.atan2(b, a) * (180/Math.PI));
+    }
+    return (angle < 0) ? angle += 360 : angle;
+}
 
 var isExpressionValid = function (expression) {
     var processedExpression = preprocessExpression(expression);
@@ -151,7 +164,9 @@ var execute = function(command, commands, idx) {
         'Repeat': repeat,
         'Forever': forever,
         'If': ifElse,
-        'Sound': playSound
+        'Sound': playSound,
+        'Rotate': rotate,
+        'SetAngle': setAngle
     };
 
     var commandExecutor = commandFactory[commandName];
@@ -315,6 +330,26 @@ var execute = function(command, commands, idx) {
             commands.executeNext(idx + 1);
         });
         soundToPlay.play();
+    }
+
+    function rotate(command, commands, idx) {
+        var rotateDegree = parseFloat(command['id']) + getRotationDegrees($('#feedbackArea .sprite'));
+        var rotateStr = 'rotate(' + rotateDegree + 'deg)';
+        $('.sprite').css('-webkit-transform', rotateStr).css('-moz-transform', rotateStr).css('-ms-transform',
+            rotateStr).css('-o-transform', rotateStr).css('transform', rotateStr);
+        $('.sprite').fadeIn('fast', function () {
+            commands.executeNext(idx + 1);
+        });
+    }
+
+    function setAngle(command, commands, idx) {
+        var rotateDegree = parseFloat(command['id']);
+        var rotateStr = 'rotate(' + rotateDegree + 'deg)';
+        $('.sprite').css('-webkit-transform', rotateStr).css('-moz-transform', rotateStr).css('-ms-transform',
+            rotateStr).css('-o-transform', rotateStr).css('transform', rotateStr);
+        $('.sprite').fadeIn('fast', function () {
+            commands.executeNext(idx + 1);
+        });
     }
 };
 
