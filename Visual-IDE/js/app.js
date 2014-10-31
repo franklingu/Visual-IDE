@@ -18,6 +18,14 @@ var soundFactory = {
     7: new Audio('sound/tick.mp3'),
     8: new Audio('sound/woosh.mp3')
 };
+var mousePosition = {x: 0, y: 0};
+
+$(function () {
+    $('#feedbackArea').mousemove(function (event) {
+        mousePosition.x = event.pageX;
+        mousePosition.y = event.pageY;
+    });
+});
 
 
 /****************************************************
@@ -78,9 +86,18 @@ $(function() {
 
 // TODO: finish this function
 var preprocessExpression = function (expression) {
-    var currX = $('.sprite').position().left;
-    var currY = $('.sprite').position().top;
-    return expression.replace('x', currX).replace('y', currY);
+    var currX = ($('.sprite').position().left - SPRITE_CENTER_X).toString();
+    var currY = (SPRITE_CENTER_Y - $('.sprite').position().top).toString();
+    var currAngle = (0).toString();
+    var currSprite = $('#feedbackArea .sprite').attr('src').substr(9, 1);
+    var currBg = $('#feedbackArea .bg-image').attr('src').substr(8, 1);
+    var canvasHeight = SPRITE_MAX_Y.toString();
+    var canvasWidth = SPRITE_MAX_X.toString();
+    var mouseX = ((mousePosition.x - $('#feedbackArea').position().left) - SPRITE_CENTER_X).toString();
+    var mouseY = (SPRITE_CENTER_Y - (mousePosition.y - $('#feedbackArea').position().top)).toString();
+    return expression.replace('spriteX', currX).replace('spriteY', currY).replace('spriteAngle',
+        currAngle).replace('spriteNumber', currSprite).replace('canvasHeight', canvasHeight).replace('canvasWidth',
+        canvasWidth).replace('canvasBg', currBg).replace('mouseX', mouseX).replace('mouseY', mouseY);
 };
 
 var isExpressionValid = function (expression) {
@@ -159,7 +176,7 @@ var execute = function(command, commands, idx) {
 
 
     function setY(command, commands, idx) {
-        var value = parseInt(command['value']) || 0;
+        var value = evalExpression(command['value']) || 0;
         var x = SPRITE_CENTER_Y - value;
         x = x > SPRITE_MAX_Y ? SPRITE_MAX_Y : x;
         x = x < 0 ? 0 : x;
