@@ -247,7 +247,6 @@ var execute = function(command, commands, idx) {
 
     function move(command, commands, idx) {
         var currX = $('#feedbackArea .sprite').position().left;
-        console.log(currX);
         var currY = $('#feedbackArea .sprite').position().top;
         var moveAmt = evalExpression(command['amount']) | 0;
         var currAngle = 0 - getRotationDegrees($('#feedbackArea .sprite'));
