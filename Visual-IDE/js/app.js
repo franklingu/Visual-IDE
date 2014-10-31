@@ -5,6 +5,17 @@ var SPRITE_MAX_Y = 372;
 var NUM_SOUNDS = 8;
 var NUM_COSTUMES = 8;
 var NUM_BACKGROUNDS = 6;
+var VAR_NAMES = [
+    "spriteX",
+    "spriteY",
+    "spriteAngle",
+    "currentCostume",
+    "canvasHeight",
+    "canvasWidth",
+    "currentBg",
+    "mouseX",
+    "mouseY"
+];
 
 
 var shouldStopExecution = false;
@@ -18,10 +29,13 @@ var soundFactory = {
     7: new Audio('sound/tick.mp3'),
     8: new Audio('sound/woosh.mp3')
 };
-var mousePosition = {x: 0, y: 0};
+var mousePosition = {
+    x: 0,
+    y: 0
+};
 
-$(function () {
-    $('#feedbackArea').mousemove(function (event) {
+$(function() {
+    $('#feedbackArea').mousemove(function(event) {
         mousePosition.x = event.pageX;
         mousePosition.y = event.pageY;
     });
@@ -38,22 +52,28 @@ $(function() {
 
     // add background images
     for (var i = 0; i < NUM_BACKGROUNDS; i++) {
-        var preview = $('<li>');
-        var title = $('<div>').addClass('title').html('Bg ' + (i + 1));
+        var preview = $('<li>').addClass('preview-element-container');
+        var command = $('<div>').addClass('command');
+        var title = $('<div>').addClass('title').attr('data-cmd-name', 'Bg').html('Bg ' + (i + 1));
         var thumbnail = $('<img>').addClass('thumbnail').attr('src', '/img/bg_' + (i + 1) % NUM_BACKGROUNDS + '.jpg');
-        var value = $('<input>').attr('type', 'hidden').attr('name', 'bgid').val(i);
-
-        preview.append(title).append(thumbnail).append(value);
+        var removeCmd = $('<span>').addClass('glyphicon glyphicon-remove pull-right hide remove-command');
+        var value = $('<input>').addClass('param').css('display', 'none').attr('name', 'id').val(i+1);
+        
+        command.append(title).append(thumbnail).append(removeCmd).append(value);
+        preview.append(command);
         backgroundsContainer.append(preview);
     }
 
     for (var i = 0; i < NUM_COSTUMES; i++) {
-        var preview = $('<li>');
-        var title = $('<div>').addClass('title').html('Costume ' + (i + 1));
+        var preview = $('<li>').addClass('preview-element-container');
+        var command = $('<div>').addClass('command');
+        var title = $('<div>').addClass('title').attr('data-cmd-name', 'Costume').html('Costume ' + (i + 1));
         var thumbnail = $('<img>').addClass('thumbnail').attr('src', '/img/cat_' + (i + 1) % NUM_COSTUMES + '.png');
-        var value = $('<input>').attr('type', 'hidden').attr('name', 'costumeid').val(i);
-
-        preview.append(title).append(thumbnail).append(value);
+        var removeCmd = $('<span>').addClass('glyphicon glyphicon-remove pull-right hide remove-command');
+        var value = $('<input>').addClass('param').css('display', 'none').attr('name', 'id').val(i+1);
+        
+        command.append(title).append(thumbnail).append(removeCmd).append(value);
+        preview.append(command);
         costumesContainer.append(preview);
     }
 });
@@ -73,6 +93,45 @@ $(function() {
         }
     });
 
+    $('#backgroundsReference > ul').find(".preview-element-container").draggable({
+        connectToSortable: ".connected-sortable",
+        forcePlaceholderSize: false,
+        helper: "clone",
+        distance: 20,
+        start: function(e, ui) {
+            ui.helper.removeClass('template-command-container ui-draggable').addClass('command-container wide');
+        }
+    });
+
+    $('#costumesReference > ul').find(".preview-element-container").draggable({
+        connectToSortable: ".connected-sortable",
+        forcePlaceholderSize: false,
+        helper: "clone",
+        distance: 20,
+        start: function(e, ui) {
+            ui.helper.removeClass('template-command-container ui-draggable').addClass('command-container wide');
+        }
+    });
+
+    $('.preview-element-container').on('click', function(){
+        var command = $(this).find('.title');
+        var commandName = command.data('cmdName');
+        var id = $(this).find('input').val();
+        if(commandName === 'Bg'){
+            var currBg = $('.bg-image');
+            var imagePath = '/img/bg_' + (id % NUM_BACKGROUNDS) + '.jpg';
+            currBg.css('display', 'hidden');
+            currBg.attr('src', imagePath);
+        }
+        else{
+            var sprite = $('.sprite');
+            var imagePath = '/img/cat_' + (id % NUM_COSTUMES) + '.png';
+            sprite.css('display', 'hidden');
+            sprite.attr('src', imagePath);
+        }
+
+
+    });
     $(".sprite").draggable({
         containment: "parent"
     });
@@ -83,7 +142,6 @@ $(function() {
     });
 
     $("#feedbackArea").droppable();
-
 
     $('#sortable2').on('change', 'input', function() {
         if (!isExpressionValid($(this).val())) {
@@ -113,9 +171,34 @@ $(function() {
         $.cookie('cachedProject', JSON.stringify(obj));
     });
 
+    $("[rel='tooltip']").tooltip({
+        html:true,
+        placement: 'bottom',
+        appendTo: 'body'
+    });
+
 });
 
-var preprocessExpression = function (expression) {
+var autocompleteOverride = function(event, ui) {
+            var fullInput = ($(this).val());
+            var words = fullInput.split(' ');
+            var lastWord = words[words.length - 1];
+            var partialInput = fullInput.substring(0, fullInput.length - lastWord.length);
+            if (lastWord.length > 1) {
+                for (var i = 0; i = ui.content.length; i++) {
+                    ui.content.pop();
+                }
+                $.each(VAR_NAMES, function(index, value) {
+                    if (value.indexOf(lastWord) == 0)
+                        ui.content.push({
+                            label: value,
+                            value: partialInput + value
+                        });
+                });
+            }
+        };
+
+var preprocessExpression = function(expression) {
     var currX = ($('#feedbackArea .sprite').position().left - SPRITE_CENTER_X).toString();
     var currY = (SPRITE_CENTER_Y - $('.sprite').position().top).toString();
     var currAngle = (getRotationDegrees($('#feedbackArea .sprite'))).toString();
@@ -126,38 +209,38 @@ var preprocessExpression = function (expression) {
     var mouseX = ((mousePosition.x - $('#feedbackArea').position().left) - SPRITE_CENTER_X).toString();
     var mouseY = (SPRITE_CENTER_Y - (mousePosition.y - $('#feedbackArea').position().top)).toString();
     return expression.replace('spriteX', currX).replace('spriteY', currY).replace('spriteAngle',
-        currAngle).replace('spriteNumber', currSprite).replace('canvasHeight', canvasHeight).replace('canvasWidth',
-        canvasWidth).replace('canvasBg', currBg).replace('mouseX', mouseX).replace('mouseY', mouseY);
+        currAngle).replace('currentCostume', currSprite).replace('canvasHeight', canvasHeight).replace('canvasWidth',
+        canvasWidth).replace('currentBg', currBg).replace('mouseX', mouseX).replace('mouseY', mouseY);
 };
 
 function getRotationDegrees(elem) {
     var matrix = elem.css("-webkit-transform") || elem.css("-moz-transform") || elem.css("-ms-transform") ||
         elem.css("-o-transform") || elem.css("transform");
     var angle = 0;
-    if(matrix !== 'none') {
+    if (matrix !== 'none') {
         var values = matrix.split('(')[1].split(')')[0].split(',');
         var a = values[0];
         var b = values[1];
-        angle = Math.round(Math.atan2(b, a) * (180/Math.PI));
+        angle = Math.round(Math.atan2(b, a) * (180 / Math.PI));
     }
     return (angle < 0) ? angle += 360 : angle;
 }
 
-var isExpressionValid = function (expression) {
+var isExpressionValid = function(expression) {
     var processedExpression = preprocessExpression(expression);
     try {
         var evalResult = math.eval(processedExpression);
         return !isNaN(evalResult);
-    } catch(err) {
+    } catch (err) {
         return false;
     }
 };
 
-var evalExpression = function (expression) {
+var evalExpression = function(expression) {
     var processedExpression = preprocessExpression(expression);
     try {
         return math.eval(processedExpression) || 0;
-    } catch(err) {
+    } catch (err) {
         return NaN;
     }
 };
@@ -167,13 +250,13 @@ var evalExpression = function (expression) {
  * Command execution *
  *********************/
 var startCommandExecution = function(commands) {
-    commands['executeNext'] = function (idx) {
+    commands['executeNext'] = function(idx) {
         if (idx < commands.length && !shouldStopExecution) {
             execute(commands[idx], commands, idx);
         } else {
             shouldStopExecution = false;
             console.log('Done with execution');
-            return ;
+            return;
         }
     };
     if (commands.length > 0) {
@@ -262,7 +345,7 @@ var execute = function(command, commands, idx) {
 
     function changeCostume(command, commands, idx) {
         var id = evalExpression(command['id']) | 0;
-        id = ((id % NUM_COSTUMES) +  NUM_COSTUMES) % NUM_COSTUMES;
+        id = ((id % NUM_COSTUMES) + NUM_COSTUMES) % NUM_COSTUMES;
         var imagePath = '/img/cat_' + id + '.png';
 
         var sprite = $('.sprite');
@@ -275,21 +358,21 @@ var execute = function(command, commands, idx) {
 
     function changeBg(command, commands, idx) {
         var id = (evalExpression(command['id']) | 0);
-        id = ((id  % NUM_BACKGROUNDS) + NUM_BACKGROUNDS) % NUM_BACKGROUNDS;
-        var currBg = $('.bg-image');       
+        id = ((id % NUM_BACKGROUNDS) + NUM_BACKGROUNDS) % NUM_BACKGROUNDS;
+        var currBg = $('.bg-image');
         var imagePath = '/img/bg_' + id + '.jpg';
         currBg.css('display', 'hidden');
         currBg.attr('src', imagePath);
         $(".bg-image").fadeIn("fast", function() {
             commands.executeNext(idx + 1);
         });
-        
+
     }
 
     function repeat(command, commands, idx) {
         var repeatTimes = evalExpression(command['iterations']) | 0;
         var repeatedTimesSoFar = 0;
-        command['commands']['executeNext'] = function (repeatIdx) {
+        command['commands']['executeNext'] = function(repeatIdx) {
             if (repeatIdx < command['commands'].length && !shouldStopExecution) {
                 execute(command['commands'][repeatIdx], command['commands'], repeatIdx);
             } else {
@@ -297,7 +380,7 @@ var execute = function(command, commands, idx) {
                 if (repeatedTimesSoFar < repeatTimes && !shouldStopExecution) {
                     execute(command['commands'][0], command['commands'], 0);
                 } else {
-                    repeatedTimesSoFar=0;
+                    repeatedTimesSoFar = 0;
                     commands.executeNext(idx + 1);
                 }
             }
@@ -310,10 +393,10 @@ var execute = function(command, commands, idx) {
     }
 
     function forever(command, commands, idx) {
-        command['commands']['executeNext'] = function (repeatIdx) {
+        command['commands']['executeNext'] = function(repeatIdx) {
             if (shouldStopExecution) {
                 shouldStopExecution = false;
-                return ;
+                return;
             }
             if (repeatIdx < command['commands'].length) {
                 execute(command['commands'][repeatIdx], command['commands'], repeatIdx);
@@ -332,7 +415,7 @@ var execute = function(command, commands, idx) {
         var rawResult = evalExpression(command['condition']);
         var condition = (typeof rawResult === 'boolean' && rawResult) || false;
         var branchToTake = condition ? 'commands1' : 'commands2';
-        command[branchToTake]['executeNext'] = function (ifElseIdx) {
+        command[branchToTake]['executeNext'] = function(ifElseIdx) {
             if (ifElseIdx < command[branchToTake].length && !shouldStopExecution) {
                 execute(command[branchToTake][ifElseIdx], command[branchToTake], ifElseIdx);
             } else {
@@ -350,7 +433,7 @@ var execute = function(command, commands, idx) {
         var soundIdx = evalExpression(command['id']) || 0;
         soundIdx = ((soundIdx + NUM_SOUNDS) % NUM_SOUNDS);
         var soundToPlay = soundFactory[soundIdx];
-        $(soundToPlay).on('ended', function () {
+        $(soundToPlay).on('ended', function() {
             $(soundToPlay).unbind('ended');
             commands.executeNext(idx + 1);
         });
@@ -362,7 +445,7 @@ var execute = function(command, commands, idx) {
         var rotateStr = 'rotate(' + rotateDegree + 'deg)';
         $('.sprite').css('-webkit-transform', rotateStr).css('-moz-transform', rotateStr).css('-ms-transform',
             rotateStr).css('-o-transform', rotateStr).css('transform', rotateStr);
-        $('.sprite').fadeIn('fast', function () {
+        $('.sprite').fadeIn('fast', function() {
             commands.executeNext(idx + 1);
         });
     }
@@ -372,7 +455,7 @@ var execute = function(command, commands, idx) {
         var rotateStr = 'rotate(' + rotateDegree + 'deg)';
         $('.sprite').css('-webkit-transform', rotateStr).css('-moz-transform', rotateStr).css('-ms-transform',
             rotateStr).css('-o-transform', rotateStr).css('transform', rotateStr);
-        $('.sprite').fadeIn('fast', function () {
+        $('.sprite').fadeIn('fast', function() {
             commands.executeNext(idx + 1);
         });
     }
@@ -448,6 +531,12 @@ $(function() {
                         commandElem.append(repeatListElem);
                     } else {
                         var paramElem = $('<input>').attr('type', 'text').addClass('param').attr('name', k).attr('value', v);
+
+                        paramElem.autocomplete({
+                            source: VAR_NAMES,
+                            autoFocus: 'true',
+                            response: autocompleteOverride
+                        });
                         removeCommand.after(paramElem);
                     }
                 });
@@ -624,7 +713,7 @@ var sortableReceiveHandle = function(e, ui) {
 };
 
 var sortableUpdateHandle = function(e, ui) {
-    $(ui.item).removeClass('template-command-container').addClass('command-container').attr('style', '')
+    $(ui.item).removeClass('template-command-container').removeClass('wide').addClass('command-container').attr('style', '')
         .find(".remove-command").removeClass('hide');
 
     $(ui.item).find('.repeat-list').removeClass('hide');
@@ -632,6 +721,21 @@ var sortableUpdateHandle = function(e, ui) {
         receive: sortableReceiveHandle,
         update: sortableUpdateHandle
     });
+
+    if($(ui.item).hasClass('preview-element-container')){
+          $(ui.item).find('input').show();
+          $(ui.item).find('img').remove();
+          var titleElement = $(ui.item).find('.title');
+          titleElement.html(titleElement.data('cmdName'));
+          $(ui.item).removeClass('preview-element-container');
+    }
+
+    $(ui.item).find('input').autocomplete({
+        source: VAR_NAMES,
+        autoFocus: 'true',
+        response: autocompleteOverride
+    });
+
     var obj = getSequenceJson();
     $.cookie('cachedProject', JSON.stringify(obj));
 };

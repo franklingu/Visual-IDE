@@ -23,9 +23,9 @@
     background-color: #eee;
     border: thin #ccc solid;
     border-radius: 10px;
-    cursor: not-allowed;
     display: inline-block;
     font-size: 14px;
+    cursor: pointer;
     height: auto;
     margin: 3px 2px;
     padding: 5px;
@@ -104,7 +104,7 @@
   float: right;
   font-size: 13px;
   height: 33px;
-  width: 60px;
+  width: 100px;
   border: thin #ccc solid;
   border-radius: 3px;
 }
@@ -195,4 +195,8 @@
 .tab-pane > ul {
   max-height: 150px;
   overflow: auto;
+}
+
+.ui-autocomplete {
+    width:100px !important;
 }

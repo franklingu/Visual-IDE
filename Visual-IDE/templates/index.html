@@ -9,7 +9,7 @@
   <link rel="stylesheet" type="text/css" href="/css/app.css">
 
   <script type="text/javascript" src="/lib/js/jquery-1.10.2.js"></script>
-  <script type="text/javascript" src="/lib/js/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="/lib/js/jquery-ui.js"></script>
   <script type="text/javascript" src="/lib/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="/js/jquery-cookie.js"></script>
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjs/1.0.1/math.min.js"></script>
@@ -109,8 +109,8 @@
                   <li class="active"><a href="#basicCommands" role="tab" data-toggle="tab">Basic</a></li>
                   <li><a href="#advancedCommands" role="tab" data-toggle="tab">Advanced</a></li>
                   <li><a href="#variablesReference" role="tab" data-toggle="tab">Variables</a></li>
-                  <li><a href="#backgroundsReference" role="tab" data-toggle="tab">Backgrounds</a></li>
-                  <li><a href="#costumesReference" role="tab" data-toggle="tab">Costumes</a></li>
+                  <li><a href="#backgroundsReference" role="tab" data-toggle="tab" rel="tooltip" title="View all the backgrounds available. Click to change background. Drag it to the Program panel to add as a command">Backgrounds</a></li>
+                  <li><a href="#costumesReference" role="tab" data-toggle="tab" rel="tooltip" title="View all the costumes available. Click to change costume. Drag it to the Program panel to add as a command">Costumes</a></li>
                 </ul>
               </div>
             </div>
@@ -233,7 +233,7 @@
                 <li><strong>spriteX</strong>: 'x' position of Sprite</li>
                 <li><strong>spriteY</strong>: 'y' position of Sprite</li>
                 <li><strong>spriteAngle</strong>: orientation of Sprite</li>
-                <li><strong>spriteNumber</strong>: Id of current Sprite</li>
+                <li><strong>currentCostume</strong>: Id of current Sprite</li>
               </ul>
             </li>
             <li>
@@ -241,7 +241,7 @@
               <ul>
                 <li><strong>canvasHeight</strong>: Height of Canvas</li>
                 <li><strong>cavasWidth</strong>: Width of Canvas</li>
-                <li><strong>canvasBg</strong>: Id of current background</li>
+                <li><strong>currentBg</strong>: Id of current background</li>
               </ul>
               <br>
             </li>
@@ -259,7 +259,7 @@
           <ul class="reference-container">
           </ul>
         </div>
-        <div class="tab-pane fade in" id="costumesReference">
+        <div class="tab-pane fade in" id="costumesReference" rel="tooltip">
           <ul class="reference-container">
           </ul>
         </div>
@@ -280,11 +280,12 @@
           </ul>
         </div>
         <div id="feedbackArea" class="col-md-9">
-          <img class="bg-image" src="/img/bg_0.jpg">
-          <img class="sprite" src="/img/cat_0.png">
+          <img class="bg-image" src="/img/bg_1.jpg">
+          <img class="sprite" src="/img/cat_1.png">
         </div>
       </div>
     </div>
   </div>
+
 </body>
 </html>
