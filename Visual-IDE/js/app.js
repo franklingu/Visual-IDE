@@ -9,14 +9,14 @@ var NUM_BACKGROUNDS = 6;
 
 var shouldStopExecution = false;
 var soundFactory = {
-    0: new Audio('sound/woosh.mp3'),
-    1: new Audio('sound/banana_slap.mp3'),
-    2: new Audio('sound/blop.mp3'),
-    3: new Audio('sound/bullet_whizzing_by.mp3'),
-    4: new Audio('sound/pin_dropping.mp3'),
-    5: new Audio('sound/realistic.mp3'),
-    6: new Audio('sound/shells_falls.mp3'),
-    7: new Audio('sound/tick.mp3')
+    0: new Audio('sound/woosh.wav')
+    1: new Audio('sound/banana_slap.wav'),
+    2: new Audio('sound/blop.wav'),
+    3: new Audio('sound/bullet_whizzing_by.wav'),
+    4: new Audio('sound/pin_dropping.wav'),
+    5: new Audio('sound/realistic.wav'),
+    6: new Audio('sound/shells_falls.wav'),
+    7: new Audio('sound/tick.wav'),
 };
 var mousePosition = {x: 0, y: 0};
 
@@ -199,7 +199,8 @@ var execute = function(command, commands, idx) {
         'If': ifElse,
         'Sound': playSound,
         'Rotate': rotate,
-        'SetAngle': setAngle
+        'SetAngle': setAngle,
+        'While': whileHandle
     };
 
     var commandExecutor = commandFactory[commandName];
@@ -250,7 +251,6 @@ var execute = function(command, commands, idx) {
 
     function move(command, commands, idx) {
         var currX = $('#feedbackArea .sprite').position().left;
-        console.log(currX);
         var currY = $('#feedbackArea .sprite').position().top;
         var moveAmt = evalExpression(command['amount']) | 0;
         var currAngle = 0 - getRotationDegrees($('#feedbackArea .sprite'));
@@ -388,6 +388,32 @@ var execute = function(command, commands, idx) {
         $('.sprite').fadeIn('fast', function () {
             commands.executeNext(idx + 1);
         });
+    }
+
+    function whileHandle(command, commands, idx) {
+        var rawResult = evalExpression(command['condition']);
+        var condition = (typeof rawResult === 'boolean' && rawResult) || false;
+        command['commands']['executeNext'] = function (repeatIdx) {
+            if (shouldStopExecution) {
+                shouldStopExecution = false;
+                commands.executeNext(idx + 1);
+                return ;
+            }
+            rawResult = evalExpression(command['condition']);
+            condition = (typeof rawResult === 'boolean' && rawResult) || false;
+            if (repeatIdx < command['commands'].length) {
+                execute(command['commands'][repeatIdx], command['commands'], repeatIdx);
+            } else if (condition) {
+                execute(command['commands'][0], command['commands'], 0);
+            } else {
+                commands.executeNext(idx + 1);
+            }
+        };
+        if (command['commands'].length > 0 && condition) {
+            execute(command['commands'][0], command['commands'], 0);
+        } else {
+            commands.executeNext(idx + 1);
+        }
     }
 };
 
@@ -603,7 +629,7 @@ var getSequenceJson = function() {
         params.each(function() {
             command[$(this).attr('name')] = $(this).val();
         });
-        if (command['title'] === 'Repeat') {
+        if (command['title'] === 'Repeat' || command['title'] === 'Forever' || command['title'] === 'While') {
             command['commands'] = [];
             var subCommands = $(elem).children('.command').children('.repeat-list').children('.connected-sortable').children('li');
             for (var i = 0; i < subCommands.length; i++) {
@@ -621,12 +647,6 @@ var getSequenceJson = function() {
 
             for (var i = 0; i < elseSubCommands.length; i++) {
                 insertCommand(elseSubCommands[i], command['commands-1']);
-            }
-        } else if (command['title'] === 'Forever') {
-            command['commands'] = [];
-            var subCommands = $(elem).children('.command').children('.repeat-list').children('.connected-sortable').children('li');
-            for (var i = 0; i < subCommands.length; i++) {
-                insertCommand(subCommands[i], command['commands']);
             }
         }
         obj.push(command);
