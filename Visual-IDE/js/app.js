@@ -20,14 +20,14 @@ var VAR_NAMES = [
 
 var shouldStopExecution = false;
 var soundFactory = {
-    1: new Audio('sound/banana_slap.mp3'),
-    2: new Audio('sound/blop.mp3'),
-    3: new Audio('sound/bullet_whizzing_by.mp3'),
-    4: new Audio('sound/pin_dropping.mp3'),
-    5: new Audio('sound/realistic.mp3'),
-    6: new Audio('sound/shells_falls.mp3'),
-    7: new Audio('sound/tick.mp3'),
-    8: new Audio('sound/woosh.mp3')
+    0: new Audio('sound/woosh.wav'),
+    1: new Audio('sound/banana_slap.wav'),
+    2: new Audio('sound/blop.wav'),
+    3: new Audio('sound/bullet_whizzing_by.wav'),
+    4: new Audio('sound/pin_dropping.wav'),
+    5: new Audio('sound/realistic.wav'),
+    6: new Audio('sound/shells_falls.wav'),
+    7: new Audio('sound/tick.wav'),
 };
 var mousePosition = {
     x: 0,
@@ -155,10 +155,12 @@ $(function() {
     });
 
     $('#playButton').on('click', function() {
+        if ($('#playButton').hasClass('unclickable')) {
+            return;
+        }
         var obj = getSequenceJson();
-        $('#playButton').prop('disabled', true);
+        $('#playButton').addClass('unclickable');
         startCommandExecution(obj.data);
-        $('#playButton').prop('disabled', false);
     });
 
     $('#stopButton').on('click', function() {
@@ -199,7 +201,7 @@ var autocompleteOverride = function(event, ui) {
         };
 
 var preprocessExpression = function(expression) {
-    var currX = ($('#feedbackArea .sprite').position().left - SPRITE_CENTER_X).toString();
+    var currX = ($('.sprite').position().left - SPRITE_CENTER_X).toString();
     var currY = (SPRITE_CENTER_Y - $('.sprite').position().top).toString();
     var currAngle = (getRotationDegrees($('#feedbackArea .sprite'))).toString();
     var currSprite = $('#feedbackArea .sprite').attr('src').substr(9, 1);
@@ -239,7 +241,8 @@ var isExpressionValid = function(expression) {
 var evalExpression = function(expression) {
     var processedExpression = preprocessExpression(expression);
     try {
-        return math.eval(processedExpression) || 0;
+        var evalResult = math.eval(processedExpression);
+        return  evalResult;
     } catch (err) {
         return NaN;
     }
@@ -255,6 +258,7 @@ var startCommandExecution = function(commands) {
             execute(commands[idx], commands, idx);
         } else {
             shouldStopExecution = false;
+            $('#playButton').removeClass('unclickable');
             console.log('Done with execution');
             return;
         }
@@ -279,7 +283,8 @@ var execute = function(command, commands, idx) {
         'If': ifElse,
         'Sound': playSound,
         'Rotate': rotate,
-        'SetAngle': setAngle
+        'SetAngle': setAngle,
+        'While': whileHandle
     };
 
     var commandExecutor = commandFactory[commandName];
@@ -290,7 +295,7 @@ var execute = function(command, commands, idx) {
     }
 
     function setX(command, commands, idx) {
-        var value = evalExpression(command['value']);
+        var value = evalExpression(command['value']) | 0;
         var x = SPRITE_CENTER_X + value;
         x = x > SPRITE_MAX_X ? SPRITE_MAX_X : x;
         x = x < 0 ? 0 : x;
@@ -304,7 +309,7 @@ var execute = function(command, commands, idx) {
 
 
     function setY(command, commands, idx) {
-        var value = evalExpression(command['value']);
+        var value = evalExpression(command['value']) | 0;
         var x = SPRITE_CENTER_Y - value;
         x = x > SPRITE_MAX_Y ? SPRITE_MAX_Y : x;
         x = x < 0 ? 0 : x;
@@ -329,15 +334,23 @@ var execute = function(command, commands, idx) {
     }
 
     function move(command, commands, idx) {
-        var currX = $('.sprite').position().left;
-        var moveXAmt = evalExpression(command['amount']) | 0;
-        var newPos = currX + moveXAmt;
+        var currX = $('#feedbackArea .sprite').position().left;
+        var currY = $('#feedbackArea .sprite').position().top;
+        var moveAmt = evalExpression(command['amount']) | 0;
+        var currAngle = 0 - getRotationDegrees($('#feedbackArea .sprite'));
+        var moveXAmt = (math.eval('cos(' + currAngle + ' deg)') * moveAmt);
+        var moveYAmt = 0 - (math.eval('sin(' + currAngle + ' deg)') * moveAmt);
+        var nextX = currX + moveXAmt;
+        var nextY = currY + moveYAmt;
 
-        newPos = newPos > SPRITE_MAX_X ? SPRITE_MAX_X : newPos;
-        newPos = newPos < 0 ? 0 : newPos;
+        nextX = nextX > SPRITE_MAX_X ? SPRITE_MAX_X : nextX;
+        nextX = nextX < 0 ? 0 : nextX;
+        nextY = nextY > SPRITE_MAX_Y ? SPRITE_MAX_Y : nextY;
+        nextY = nextY < 0 ? 0 : nextY;
 
         $(".sprite").animate({
-            left: newPos
+            left: nextX,
+            top: nextY
         }, function() {
             commands.executeNext(idx + 1);
         });
@@ -396,6 +409,7 @@ var execute = function(command, commands, idx) {
         command['commands']['executeNext'] = function(repeatIdx) {
             if (shouldStopExecution) {
                 shouldStopExecution = false;
+                commands.executeNext(idx + 1);
                 return;
             }
             if (repeatIdx < command['commands'].length) {
@@ -414,7 +428,7 @@ var execute = function(command, commands, idx) {
     function ifElse(command, commands, idx) {
         var rawResult = evalExpression(command['condition']);
         var condition = (typeof rawResult === 'boolean' && rawResult) || false;
-        var branchToTake = condition ? 'commands1' : 'commands2';
+        var branchToTake = condition ? 'commands' : 'commands-1';
         command[branchToTake]['executeNext'] = function(ifElseIdx) {
             if (ifElseIdx < command[branchToTake].length && !shouldStopExecution) {
                 execute(command[branchToTake][ifElseIdx], command[branchToTake], ifElseIdx);
@@ -459,6 +473,32 @@ var execute = function(command, commands, idx) {
             commands.executeNext(idx + 1);
         });
     }
+
+    function whileHandle(command, commands, idx) {
+        var rawResult = evalExpression(command['condition']);
+        var condition = (typeof rawResult === 'boolean' && rawResult) || false;
+        command['commands']['executeNext'] = function (repeatIdx) {
+            if (shouldStopExecution) {
+                shouldStopExecution = false;
+                commands.executeNext(idx + 1);
+                return ;
+            }
+            rawResult = evalExpression(command['condition']);
+            condition = (typeof rawResult === 'boolean' && rawResult) || false;
+            if (repeatIdx < command['commands'].length) {
+                execute(command['commands'][repeatIdx], command['commands'], repeatIdx);
+            } else if (condition) {
+                execute(command['commands'][0], command['commands'], 0);
+            } else {
+                commands.executeNext(idx + 1);
+            }
+        };
+        if (command['commands'].length > 0 && condition) {
+            execute(command['commands'][0], command['commands'], 0);
+        } else {
+            commands.executeNext(idx + 1);
+        }
+    }
 };
 
 
@@ -467,6 +507,22 @@ var execute = function(command, commands, idx) {
  *********************************************/
 $(function() {
     var loadFromJSON = function(objStr) {
+        loadFromFactory = {
+            'SetX': normalLoad,
+            'SetY': normalLoad,
+            'Show': normalLoad,
+            'Hide': normalLoad,
+            'Move': normalLoad,
+            'Costume': normalLoad,
+            'Bg': normalLoad,
+            'Repeat': nestedLoad,
+            'Forever': nestedLoad,
+            'If': nestedLoad,
+            'Sound': normalLoad,
+            'Rotate': normalLoad,
+            'SetAngle': normalLoad,
+            'While' : nestedLoad
+        };
         if (objStr) {
             $('#sortable2').empty();
             var commands = JSON.parse(objStr);
@@ -477,59 +533,52 @@ $(function() {
                 for (var i = 0; i < commands.length; i++) {
                     var listElem = $('<li>').addClass('ui-state-default command-container');
                     var commandElem = $('<div>').addClass('command');
-                    recoverCommandNode(commands[i], commandElem);
+                    loadFromFactory[commands[i]['title']](commands[i], commandElem)
                     listElem.append(commandElem);
                     container.append(listElem);
                 };
             }
 
-            function recoverCommandNode(command, commandElem) {
+            function normalLoad(command, commandElem) {
                 var removeCommand = $('<span>').addClass("glyphicon glyphicon-remove pull-right remove-command");
                 commandElem.append(removeCommand);
                 var commandName = $('<div>').addClass("title").text(command["title"]);
                 commandElem.append(commandName);
 
-                if (command['title'] === 'If') {
-                    // handle if-branch commands list
-                    var repeatListElem = $('<div>').addClass('repeat-list').attr('id', 'ifExec');
-                    var ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
-                    ulListElem.sortable({
-                        receive: sortableReceiveHandle,
-                        update: sortableUpdateHandle
-                    });
-                    loadCommands(command['commands1'], ulListElem);
-                    repeatListElem.append(ulListElem);
-                    commandElem.append(repeatListElem);
-
-                    // write down Else
-                    var secondTitle = $('<div>').addClass('title-2').html('Else');
-                    commandElem.append(secondTitle);
-
-                    // handle else-branch commands list
-                    repeatListElem = $('<div>').addClass('repeat-list').attr('id', 'elseExec');
-                    ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
-                    ulListElem.sortable({
-                        receive: sortableReceiveHandle,
-                        update: sortableUpdateHandle
-                    });
-                    loadCommands(command['commands2'], ulListElem);
-                    repeatListElem.append(ulListElem);
-                    commandElem.append(repeatListElem);
-                }
                 $.each(command, function(k, v) {
-                    if (k === 'title' || k === 'commands1' || k === 'commands2') {
-                        // skip as they handled separately
-                    } else if (k === 'commands') {
-                        var repeatListElem = $('<div>').addClass('repeat-list');
+                    if (k != 'title') {
+                        var paramElem = $('<input>').attr('type', 'text').addClass('param').attr('name', k).attr('value', v);
+                        removeCommand.after(paramElem);
+                    }
+                });
+            };
+
+            function nestedLoad(command, commandElem) {
+                var removeCommand = $('<span>').addClass("glyphicon glyphicon-remove pull-right remove-command");
+                commandElem.append(removeCommand);
+
+                for (var i = 1; ; i++) {
+                    if (command['title-'+i]) {
+                        var commandName = $('<div>').addClass('title title-'+i).text(command['title-'+i]);
+                        commandElem.append(commandName);
+
+                        // handle first-nested commands list
+                        var repeatListElem = $('<div>').addClass('repeat-list sub-list-'+i);
                         var ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
                         ulListElem.sortable({
                             receive: sortableReceiveHandle,
                             update: sortableUpdateHandle
                         });
-                        loadCommands(v, ulListElem);
+                        loadCommands(command['commands-'+i], ulListElem);
                         repeatListElem.append(ulListElem);
                         commandElem.append(repeatListElem);
                     } else {
+                        break;
+                    }
+                }
+
+                $.each(command, function(k, v) {
+                    if (k.indexOf('commands') != 0 && k.indexOf('id') != 0 && k.indexOf('title') != 0) {
                         var paramElem = $('<input>').attr('type', 'text').addClass('param').attr('name', k).attr('value', v);
 
                         paramElem.autocomplete({
@@ -664,36 +713,33 @@ $(function() {
 var getSequenceJson = function() {
     function insertCommand(elem, obj) {
         var command = {};
-        command['title'] = $(elem).children('.command').children(".title").html();
+        command['title'] = $(elem).children('.command').children('.title').first().html();
 
         var params = $(elem).children('.command').children('.param');
         params.each(function() {
             command[$(this).attr('name')] = $(this).val();
         });
-        if (command['title'] === 'Repeat') {
-            command['commands'] = [];
+        if (command['title'] === 'Repeat' || command['title'] === 'Forever' || command['title'] === 'While') {
+            command['title-1'] = command['title'];
+            command['commands-1'] = [];
             var subCommands = $(elem).children('.command').children('.repeat-list').children('.connected-sortable').children('li');
             for (var i = 0; i < subCommands.length; i++) {
-                insertCommand(subCommands[i], command['commands']);
+                insertCommand(subCommands[i], command['commands-1']);
             }
         } else if (command['title'] === 'If') {
-            command['commands1'] = [];
-            command['commands2'] = [];
-            var ifSubCommands = $(elem).find('#ifExec').children('.connected-sortable').children('li');
-            var elseSubCommands = $(elem).find('#elseExec').children('.connected-sortable').children('li');
+            command['title-1'] = 'If';
+            command['title-2'] = 'Else';
+            command['commands-1'] = [];
+            command['commands-2'] = [];
+            var ifSubCommands = $(elem).find('.sub-list-1').children('.connected-sortable').children('li');
+            var elseSubCommands = $(elem).find('.sub-list-2').children('.connected-sortable').children('li');
 
             for (var i = 0; i < ifSubCommands.length; i++) {
-                insertCommand(ifSubCommands[i], command['commands1']);
+                insertCommand(ifSubCommands[i], command['commands-1']);
             }
 
             for (var i = 0; i < elseSubCommands.length; i++) {
-                insertCommand(elseSubCommands[i], command['commands2']);
-            }
-        } else if (command['title'] === 'Forever') {
-            command['commands'] = [];
-            var subCommands = $(elem).children('.command').children('.repeat-list').children('.connected-sortable').children('li');
-            for (var i = 0; i < subCommands.length; i++) {
-                insertCommand(subCommands[i], command['commands']);
+                insertCommand(elseSubCommands[i], command['commands-2']);
             }
         }
         obj.push(command);
