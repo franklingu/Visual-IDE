@@ -118,7 +118,7 @@ $(function() {
 });
 
 var preprocessExpression = function (expression) {
-    var currX = ($('#feedbackArea .sprite').position().left - SPRITE_CENTER_X).toString();
+    var currX = ($('.sprite').position().left - SPRITE_CENTER_X).toString();
     var currY = (SPRITE_CENTER_Y - $('.sprite').position().top).toString();
     var currAngle = (getRotationDegrees($('#feedbackArea .sprite'))).toString();
     var currSprite = $('#feedbackArea .sprite').attr('src').substr(9, 1);
@@ -158,7 +158,8 @@ var isExpressionValid = function (expression) {
 var evalExpression = function (expression) {
     var processedExpression = preprocessExpression(expression);
     try {
-        return math.eval(processedExpression) || 0;
+        var evalResult = math.eval(processedExpression);
+        return  evalResult;
     } catch(err) {
         return NaN;
     }
@@ -256,7 +257,7 @@ var execute = function(command, commands, idx) {
         var currAngle = 0 - getRotationDegrees($('#feedbackArea .sprite'));
         var moveXAmt = (math.eval('cos(' + currAngle + ' deg)') * moveAmt);
         var moveYAmt = 0 - (math.eval('sin(' + currAngle + ' deg)') * moveAmt);
-        var nextX = currX + moveXAmt + 27.1;  // a weird bug: suspect it is because of center of sprite
+        var nextX = currX + moveXAmt;
         var nextY = currY + moveYAmt;
 
         nextX = nextX > SPRITE_MAX_X ? SPRITE_MAX_X : nextX;
