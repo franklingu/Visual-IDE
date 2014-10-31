@@ -6,7 +6,7 @@
   font-size: 18px;
 }
 
-.commandsContainer, #sortable2, .variables-container {
+.commandsContainer, #sortable2, .variables-container, .reference-container {
   border: 3px solid #000;
   min-height: 20px;
   list-style-type: none;
@@ -14,12 +14,12 @@
   padding: 0 0 0 0;
 }
 
-.commandsContainer, .variables-container {
+.commandsContainer, .variables-container, .reference-container {
   width: 100%;
   z-index: 110;
 }
 
-  .variables-container > li {
+  .variables-container > li, .reference-container > li {
     background-color: #eee;
     border: thin #ccc solid;
     border-radius: 10px;
@@ -31,6 +31,10 @@
     padding: 5px;
     width: 32.5%;
     z-index: 100;
+  }
+
+  .reference-container > li {
+    width: 24%;
   }
 
 #sortable2 {
@@ -90,6 +94,10 @@
   padding: 5px;
   width: 24%;
   z-index: 100;
+}
+
+.reference-container {
+  height: auto;
 }
 
 .param{
@@ -173,4 +181,13 @@
 .bg-image{
   width: 100%;
   height: 100%;
+}
+
+.thumbnail {
+  background-color: white;
+  width: 50px;
+  height: 50px;
+  display: inline-block;
+  margin: 0px;
+  float: right;
 }
