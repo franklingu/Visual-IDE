@@ -196,7 +196,8 @@ var execute = function(command, commands, idx) {
         'If': ifElse,
         'Sound': playSound,
         'Rotate': rotate,
-        'SetAngle': setAngle
+        'SetAngle': setAngle,
+        'While': whileHandle
     };
 
     var commandExecutor = commandFactory[commandName];
@@ -383,6 +384,32 @@ var execute = function(command, commands, idx) {
         $('.sprite').fadeIn('fast', function () {
             commands.executeNext(idx + 1);
         });
+    }
+
+    function whileHandle(command, commands, idx) {
+        var rawResult = evalExpression(command['condition']);
+        var condition = (typeof rawResult === 'boolean' && rawResult) || false;
+        command['commands']['executeNext'] = function (repeatIdx) {
+            if (shouldStopExecution) {
+                shouldStopExecution = false;
+                commands.executeNext(idx + 1);
+                return ;
+            }
+            rawResult = evalExpression(command['condition']);
+            condition = (typeof rawResult === 'boolean' && rawResult) || false;
+            if (repeatIdx < command['commands'].length) {
+                execute(command['commands'][repeatIdx], command['commands'], repeatIdx);
+            } else if (condition) {
+                execute(command['commands'][0], command['commands'], 0);
+            } else {
+                commands.executeNext(idx + 1);
+            }
+        };
+        if (command['commands'].length > 0 && condition) {
+            execute(command['commands'][0], command['commands'], 0);
+        } else {
+            commands.executeNext(idx + 1);
+        }
     }
 };
 
@@ -589,7 +616,7 @@ var getSequenceJson = function() {
         params.each(function() {
             command[$(this).attr('name')] = $(this).val();
         });
-        if (command['title'] === 'Repeat') {
+        if (command['title'] === 'Repeat' || command['title'] === 'Forever' || command['title'] === 'While') {
             command['commands'] = [];
             var subCommands = $(elem).children('.command').children('.repeat-list').children('.connected-sortable').children('li');
             for (var i = 0; i < subCommands.length; i++) {
@@ -607,12 +634,6 @@ var getSequenceJson = function() {
 
             for (var i = 0; i < elseSubCommands.length; i++) {
                 insertCommand(elseSubCommands[i], command['commands2']);
-            }
-        } else if (command['title'] === 'Forever') {
-            command['commands'] = [];
-            var subCommands = $(elem).children('.command').children('.repeat-list').children('.connected-sortable').children('li');
-            for (var i = 0; i < subCommands.length; i++) {
-                insertCommand(subCommands[i], command['commands']);
             }
         }
         obj.push(command);
