@@ -39,24 +39,22 @@ $(function() {
     // add background images
     for (var i = 0; i < NUM_BACKGROUNDS; i++) {
         var preview = $('<li>');
-        var title = $('<div>').addClass('title').html('Bg ' + i);
+        var title = $('<div>').addClass('title').html('Bg ' + (i + 1));
         var thumbnail = $('<img>').addClass('thumbnail').attr('src', '/img/bg_' + (i + 1) % NUM_BACKGROUNDS + '.jpg');
         var value = $('<input>').attr('type', 'hidden').attr('name', 'bgid').val(i);
 
         preview.append(title).append(thumbnail).append(value);
         backgroundsContainer.append(preview);
-        alert(title);
     }
 
     for (var i = 0; i < NUM_COSTUMES; i++) {
         var preview = $('<li>');
-        var title = $('<div>').addClass('title').html('Costume ' + i);
+        var title = $('<div>').addClass('title').html('Costume ' + (i + 1));
         var thumbnail = $('<img>').addClass('thumbnail').attr('src', '/img/cat_' + (i + 1) % NUM_COSTUMES + '.png');
         var value = $('<input>').attr('type', 'hidden').attr('name', 'costumeid').val(i);
 
         preview.append(title).append(thumbnail).append(value);
         costumesContainer.append(preview);
-        alert(value);
     }
 });
 
