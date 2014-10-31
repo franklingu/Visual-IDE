@@ -9,7 +9,7 @@ var NUM_BACKGROUNDS = 6;
 
 var shouldStopExecution = false;
 var soundFactory = {
-    0: new Audio('sound/woosh.wav')
+    0: new Audio('sound/woosh.wav'),
     1: new Audio('sound/banana_slap.wav'),
     2: new Audio('sound/blop.wav'),
     3: new Audio('sound/bullet_whizzing_by.wav'),
@@ -479,7 +479,7 @@ $(function() {
                         commandElem.append(commandName);
 
                         // handle first-nested commands list
-                        var repeatListElem = $('<div>').addClass('repeat-list').attr('id', command['id-'+i]);
+                        var repeatListElem = $('<div>').addClass('repeat-list sub-list-'+i);
                         var ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
                         ulListElem.sortable({
                             receive: sortableReceiveHandle,
@@ -623,30 +623,33 @@ $(function() {
 var getSequenceJson = function() {
     function insertCommand(elem, obj) {
         var command = {};
-        command['title'] = $(elem).children('.command').children(".title").html();
+        command['title'] = $(elem).children('.command').children('.title').first().html();
 
         var params = $(elem).children('.command').children('.param');
         params.each(function() {
             command[$(this).attr('name')] = $(this).val();
         });
         if (command['title'] === 'Repeat' || command['title'] === 'Forever' || command['title'] === 'While') {
-            command['commands'] = [];
+            command['title-1'] = command['title'];
+            command['commands-1'] = [];
             var subCommands = $(elem).children('.command').children('.repeat-list').children('.connected-sortable').children('li');
             for (var i = 0; i < subCommands.length; i++) {
-                insertCommand(subCommands[i], command['commands']);
+                insertCommand(subCommands[i], command['commands-1']);
             }
         } else if (command['title'] === 'If') {
-            command['commands'] = [];
+            command['title-1'] = 'If';
+            command['title-2'] = 'Else';
             command['commands-1'] = [];
-            var ifSubCommands = $(elem).find('#ifExec').children('.connected-sortable').children('li');
-            var elseSubCommands = $(elem).find('#elseExec').children('.connected-sortable').children('li');
+            command['commands-2'] = [];
+            var ifSubCommands = $(elem).find('.sub-list-1').children('.connected-sortable').children('li');
+            var elseSubCommands = $(elem).find('.sub-list-2').children('.connected-sortable').children('li');
 
             for (var i = 0; i < ifSubCommands.length; i++) {
-                insertCommand(ifSubCommands[i], command['commands']);
+                insertCommand(ifSubCommands[i], command['commands-1']);
             }
 
             for (var i = 0; i < elseSubCommands.length; i++) {
-                insertCommand(elseSubCommands[i], command['commands-1']);
+                insertCommand(elseSubCommands[i], command['commands-2']);
             }
         }
         obj.push(command);
