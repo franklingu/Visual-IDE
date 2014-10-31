@@ -69,7 +69,6 @@ $(function() {
         var obj = getSequenceJson();
         $('#playButton').prop('disabled', true);
         startCommandExecution(obj.data);
-        $('#playButton').prop('disabled', false);
     });
 
     $('#stopButton').on('click', function() {
@@ -141,6 +140,7 @@ var startCommandExecution = function(commands) {
             execute(commands[idx], commands, idx);
         } else {
             shouldStopExecution = false;
+            $('#playButton').prop('disabled', false);
             console.log('Done with execution');
             return ;
         }
@@ -176,7 +176,7 @@ var execute = function(command, commands, idx) {
     }
 
     function setX(command, commands, idx) {
-        var value = evalExpression(command['value']);
+        var value = evalExpression(command['value']) | 0;
         var x = SPRITE_CENTER_X + value;
         x = x > SPRITE_MAX_X ? SPRITE_MAX_X : x;
         x = x < 0 ? 0 : x;
@@ -190,7 +190,7 @@ var execute = function(command, commands, idx) {
 
 
     function setY(command, commands, idx) {
-        var value = evalExpression(command['value']);
+        var value = evalExpression(command['value']) | 0;
         var x = SPRITE_CENTER_Y - value;
         x = x > SPRITE_MAX_Y ? SPRITE_MAX_Y : x;
         x = x < 0 ? 0 : x;
@@ -215,15 +215,24 @@ var execute = function(command, commands, idx) {
     }
 
     function move(command, commands, idx) {
-        var currX = $('.sprite').position().left;
-        var moveXAmt = evalExpression(command['amount']) | 0;
-        var newPos = currX + moveXAmt;
+        var currX = $('#feedbackArea .sprite').position().left;
+        console.log(currX);
+        var currY = $('#feedbackArea .sprite').position().top;
+        var moveAmt = evalExpression(command['amount']) | 0;
+        var currAngle = 0 - getRotationDegrees($('#feedbackArea .sprite'));
+        var moveXAmt = (math.eval('cos(' + currAngle + ' deg)') * moveAmt);
+        var moveYAmt = 0 - (math.eval('sin(' + currAngle + ' deg)') * moveAmt);
+        var nextX = currX + moveXAmt + 27.1;  // a weird bug: suspect it is because of center of sprite
+        var nextY = currY + moveYAmt;
 
-        newPos = newPos > SPRITE_MAX_X ? SPRITE_MAX_X : newPos;
-        newPos = newPos < 0 ? 0 : newPos;
+        nextX = nextX > SPRITE_MAX_X ? SPRITE_MAX_X : nextX;
+        nextX = nextX < 0 ? 0 : nextX;
+        nextY = nextY > SPRITE_MAX_Y ? SPRITE_MAX_Y : nextY;
+        nextY = nextY < 0 ? 0 : nextY;
 
         $(".sprite").animate({
-            left: newPos
+            left: nextX,
+            top: nextY
         }, function() {
             commands.executeNext(idx + 1);
         });
