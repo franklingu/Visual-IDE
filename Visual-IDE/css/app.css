@@ -72,6 +72,7 @@
   border: thin #ccc solid !important;
   cursor: move;
   font-size: 14px;
+  list-style-type: none;
   min-height: 45px !important;
   padding: 5px !important;
   background-color: #fff;
