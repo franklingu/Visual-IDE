@@ -2,6 +2,10 @@ var SPRITE_CENTER_X = 350;
 var SPRITE_CENTER_Y = 175;
 var SPRITE_MAX_X = 765;
 var SPRITE_MAX_Y = 372;
+var NUM_SOUNDS = 8;
+var NUM_COSTUMES = 8;
+var NUM_BACKGROUNDS = 6;
+
 
 var shouldStopExecution = false;
 var soundFactory = {
@@ -21,24 +25,6 @@ $(function () {
         mousePosition.x = event.pageX;
         mousePosition.y = event.pageY;
     });
-});
-
-
-/***************************************************
- * create options for change-bg and change-choice *
- ***************************************************/
-$(function() {
-    var changeBgCommand = $(".template-command-container .change-bg");
-    for (var i = 0; i <= 5; i++) {
-        var option = $('<option>').html(i);
-        changeBgCommand.append(option);
-    }
-
-    var changeCostumeCommand = $(".template-command-container .change-choice");
-    for (var i = 1; i <= 8; i++) {
-        var option = $('<option>').html(i);
-        changeCostumeCommand.append(option);
-    }
 });
 
 
@@ -230,7 +216,8 @@ var execute = function(command, commands, idx) {
     }
 
     function changeCostume(command, commands, idx) {
-        var id = command['id'];
+        var id = parseInt(command['id']);
+        id = ((id + NUM_COSTUMES) % NUM_COSTUMES);
         var imagePath = '/img/cat_' + id + '.png';
 
         var sprite = $('.sprite');
@@ -242,9 +229,10 @@ var execute = function(command, commands, idx) {
     }
 
     function changeBg(command, commands, idx) {
-        var id = command['id'];
+        var id = parseInt(command['id']);
+        id = ((id + NUM_BACKGROUNDS) % NUM_BACKGROUNDS);
         var currBg = $('.bg-image');
-        if (id == 0) {
+        if (id == 1) {
             currBg.fadeOut("fast", function() {
                 commands.executeNext(idx + 1);
             });
@@ -319,7 +307,8 @@ var execute = function(command, commands, idx) {
     }
 
     function playSound(command, commands, idx) {
-        var soundIdx = command['id'];
+        var soundIdx = parseInt(command['id']);
+        soundIdx = ((soundIdx + NUM_SOUNDS) % NUM_SOUNDS);
         var soundToPlay = soundFactory[soundIdx];
         $(soundToPlay).on('ended', function () {
             $(soundToPlay).unbind('ended');
@@ -397,31 +386,6 @@ $(function() {
                         loadCommands(v, ulListElem);
                         repeatListElem.append(ulListElem);
                         commandElem.append(repeatListElem);
-                    } else if (k === 'id') {
-                        if (command['title'] === 'Bg') {
-                            var changeBgCommand = $('<select>').addClass('param change-bg').attr('name', k);
-                            var value = parseInt(v) || 0;
-                            for (var i = 0; i <= 5; i++) {
-                                var option = $('<option>').html(i);
-                                if (value === i) {
-                                    option.attr('selected', 'selected');
-                                }
-                                changeBgCommand.append(option);
-                            }
-                            commandElem.append(changeBgCommand);
-                        }
-                        if (command['title'] === 'Costume') {
-                            var changeCostumeCommand = $('<select>').addClass('param change-choice').attr('name', k);
-                            var value = parseInt(v) || 0;
-                            for (var i = 1; i <= 8; i++) {
-                                var option = $('<option>').html(i);
-                                if (value === i) {
-                                    option.attr('selected', 'selected');
-                                };
-                                changeCostumeCommand.append(option);
-                            }
-                            commandElem.append(changeCostumeCommand);
-                        }
                     } else {
                         var paramElem = $('<input>').attr('type', 'text').addClass('param').attr('name', k).attr('value', v);
                         removeCommand.after(paramElem);
