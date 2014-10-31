@@ -9,14 +9,14 @@ var NUM_BACKGROUNDS = 6;
 
 var shouldStopExecution = false;
 var soundFactory = {
-    1: new Audio('sound/banana_slap.mp3'),
-    2: new Audio('sound/blop.mp3'),
-    3: new Audio('sound/bullet_whizzing_by.mp3'),
-    4: new Audio('sound/pin_dropping.mp3'),
-    5: new Audio('sound/realistic.mp3'),
-    6: new Audio('sound/shells_falls.mp3'),
-    7: new Audio('sound/tick.mp3'),
-    8: new Audio('sound/woosh.mp3')
+    1: new Audio('sound/banana_slap.wav'),
+    2: new Audio('sound/blop.wav'),
+    3: new Audio('sound/bullet_whizzing_by.wav'),
+    4: new Audio('sound/pin_dropping.wav'),
+    5: new Audio('sound/realistic.wav'),
+    6: new Audio('sound/shells_falls.wav'),
+    7: new Audio('sound/tick.wav'),
+    8: new Audio('sound/woosh.wav')
 };
 var mousePosition = {x: 0, y: 0};
 
