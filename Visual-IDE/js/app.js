@@ -9,14 +9,14 @@ var NUM_BACKGROUNDS = 6;
 
 var shouldStopExecution = false;
 var soundFactory = {
+    0: new Audio('sound/woosh.mp3'),
     1: new Audio('sound/banana_slap.mp3'),
     2: new Audio('sound/blop.mp3'),
     3: new Audio('sound/bullet_whizzing_by.mp3'),
     4: new Audio('sound/pin_dropping.mp3'),
     5: new Audio('sound/realistic.mp3'),
     6: new Audio('sound/shells_falls.mp3'),
-    7: new Audio('sound/tick.mp3'),
-    8: new Audio('sound/woosh.mp3')
+    7: new Audio('sound/tick.mp3')
 };
 var mousePosition = {x: 0, y: 0};
 
@@ -97,8 +97,11 @@ $(function() {
     });
 
     $('#playButton').on('click', function() {
+        if ($('#playButton').hasClass('unclickable')) {
+            return;
+        }
         var obj = getSequenceJson();
-        $('#playButton').prop('disabled', true);
+        $('#playButton').addClass('unclickable');
         startCommandExecution(obj.data);
     });
 
@@ -171,7 +174,7 @@ var startCommandExecution = function(commands) {
             execute(commands[idx], commands, idx);
         } else {
             shouldStopExecution = false;
-            $('#playButton').prop('disabled', false);
+            $('#playButton').removeClass('unclickable');
             console.log('Done with execution');
             return ;
         }
@@ -322,7 +325,8 @@ var execute = function(command, commands, idx) {
         command['commands']['executeNext'] = function (repeatIdx) {
             if (shouldStopExecution) {
                 shouldStopExecution = false;
-                return ;
+                commands.executeNext(idx + 1);
+                return;
             }
             if (repeatIdx < command['commands'].length) {
                 execute(command['commands'][repeatIdx], command['commands'], repeatIdx);
