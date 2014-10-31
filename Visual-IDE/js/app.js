@@ -84,7 +84,6 @@ $(function() {
 
 });
 
-// TODO: finish this function
 var preprocessExpression = function (expression) {
     var currX = ($('#feedbackArea .sprite').position().left - SPRITE_CENTER_X).toString();
     var currY = (SPRITE_CENTER_Y - $('.sprite').position().top).toString();
@@ -116,8 +115,8 @@ function getRotationDegrees(elem) {
 var isExpressionValid = function (expression) {
     var processedExpression = preprocessExpression(expression);
     try {
-        math.eval(processedExpression);
-        return true;
+        var evalResult = math.eval(processedExpression);
+        return !isNaN(evalResult);
     } catch(err) {
         return false;
     }
@@ -126,7 +125,7 @@ var isExpressionValid = function (expression) {
 var evalExpression = function (expression) {
     var processedExpression = preprocessExpression(expression);
     try {
-        return math.eval(processedExpression);
+        return math.eval(processedExpression) || 0;
     } catch(err) {
         return NaN;
     }
@@ -177,7 +176,7 @@ var execute = function(command, commands, idx) {
     }
 
     function setX(command, commands, idx) {
-        var value = evalExpression(command['value']) || 0;
+        var value = evalExpression(command['value']);
         var x = SPRITE_CENTER_X + value;
         x = x > SPRITE_MAX_X ? SPRITE_MAX_X : x;
         x = x < 0 ? 0 : x;
@@ -191,7 +190,7 @@ var execute = function(command, commands, idx) {
 
 
     function setY(command, commands, idx) {
-        var value = evalExpression(command['value']) || 0;
+        var value = evalExpression(command['value']);
         var x = SPRITE_CENTER_Y - value;
         x = x > SPRITE_MAX_Y ? SPRITE_MAX_Y : x;
         x = x < 0 ? 0 : x;
