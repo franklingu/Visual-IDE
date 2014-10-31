@@ -27,9 +27,40 @@ $(function () {
     });
 });
 
+/****************************************************
+ *** adding previews for backgrounds and costumes ***
+ ****************************************************/
+
+$(function() {
+
+    var costumesContainer = $('#costumesReference > ul');
+    var backgroundsContainer = $('#backgroundsReference > ul');
+
+    // add background images
+    for (var i = 0; i < NUM_BACKGROUNDS; i++) {
+        var preview = $('<li>');
+        var title = $('<div>').addClass('title').html('Bg ' + (i + 1));
+        var thumbnail = $('<img>').addClass('thumbnail').attr('src', '/img/bg_' + (i + 1) % NUM_BACKGROUNDS + '.jpg');
+        var value = $('<input>').attr('type', 'hidden').attr('name', 'bgid').val(i);
+
+        preview.append(title).append(thumbnail).append(value);
+        backgroundsContainer.append(preview);
+    }
+
+    for (var i = 0; i < NUM_COSTUMES; i++) {
+        var preview = $('<li>');
+        var title = $('<div>').addClass('title').html('Costume ' + (i + 1));
+        var thumbnail = $('<img>').addClass('thumbnail').attr('src', '/img/cat_' + (i + 1) % NUM_COSTUMES + '.png');
+        var value = $('<input>').attr('type', 'hidden').attr('name', 'costumeid').val(i);
+
+        preview.append(title).append(thumbnail).append(value);
+        costumesContainer.append(preview);
+    }
+});
+
 
 /****************************************************
- * attching object types and events to DOM elements *
+ * attaching object types and events to DOM elements *
  ****************************************************/
 $(function() {
     $(".commandsContainer").find("li").draggable({
@@ -240,7 +271,7 @@ var execute = function(command, commands, idx) {
 
     function changeCostume(command, commands, idx) {
         var id = evalExpression(command['id']) | 0;
-        id = ((id + NUM_COSTUMES) % NUM_COSTUMES);
+        id = ((id % NUM_COSTUMES) +  NUM_COSTUMES) % NUM_COSTUMES;
         var imagePath = '/img/cat_' + id + '.png';
 
         var sprite = $('.sprite');
@@ -252,21 +283,16 @@ var execute = function(command, commands, idx) {
     }
 
     function changeBg(command, commands, idx) {
-        var id = evalExpression(command['id']) | 0;
-        id = ((id + NUM_BACKGROUNDS) % NUM_BACKGROUNDS);
-        var currBg = $('.bg-image');
-        if (id == 1) {
-            currBg.fadeOut("fast", function() {
-                commands.executeNext(idx + 1);
-            });
-        } else {
-            var imagePath = '/img/bg_' + id + '.jpg';
-            currBg.css('display', 'hidden');
-            currBg.attr('src', imagePath);
-            $(".bg-image").fadeIn("fast", function() {
-                commands.executeNext(idx + 1);
-            });
-        }
+        var id = (evalExpression(command['id']) | 0);
+        id = ((id  % NUM_BACKGROUNDS) + NUM_BACKGROUNDS) % NUM_BACKGROUNDS;
+        var currBg = $('.bg-image');       
+        var imagePath = '/img/bg_' + id + '.jpg';
+        currBg.css('display', 'hidden');
+        currBg.attr('src', imagePath);
+        $(".bg-image").fadeIn("fast", function() {
+            commands.executeNext(idx + 1);
+        });
+        
     }
 
     function repeat(command, commands, idx) {
