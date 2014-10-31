@@ -344,7 +344,7 @@ var execute = function(command, commands, idx) {
     function ifElse(command, commands, idx) {
         var rawResult = evalExpression(command['condition']);
         var condition = (typeof rawResult === 'boolean' && rawResult) || false;
-        var branchToTake = condition ? 'commands1' : 'commands2';
+        var branchToTake = condition ? 'commands' : 'commands-1';
         command[branchToTake]['executeNext'] = function (ifElseIdx) {
             if (ifElseIdx < command[branchToTake].length && !shouldStopExecution) {
                 execute(command[branchToTake][ifElseIdx], command[branchToTake], ifElseIdx);
@@ -397,6 +397,22 @@ var execute = function(command, commands, idx) {
  *********************************************/
 $(function() {
     var loadFromJSON = function(objStr) {
+        loadFromFactory = {
+            'SetX': normalLoad,
+            'SetY': normalLoad,
+            'Show': normalLoad,
+            'Hide': normalLoad,
+            'Move': normalLoad,
+            'Costume': normalLoad,
+            'Bg': normalLoad,
+            'Repeat': nestedLoad,
+            'Forever': nestedLoad,
+            'If': nestedLoad,
+            'Sound': normalLoad,
+            'Rotate': normalLoad,
+            'SetAngle': normalLoad,
+            'While' : nestedLoad
+        };
         if (objStr) {
             $('#sortable2').empty();
             var commands = JSON.parse(objStr);
@@ -407,59 +423,52 @@ $(function() {
                 for (var i = 0; i < commands.length; i++) {
                     var listElem = $('<li>').addClass('ui-state-default command-container');
                     var commandElem = $('<div>').addClass('command');
-                    recoverCommandNode(commands[i], commandElem);
+                    loadFromFactory[commands[i]['title']](commands[i], commandElem)
                     listElem.append(commandElem);
                     container.append(listElem);
                 };
             }
 
-            function recoverCommandNode(command, commandElem) {
+            function normalLoad(command, commandElem) {
                 var removeCommand = $('<span>').addClass("glyphicon glyphicon-remove pull-right remove-command");
                 commandElem.append(removeCommand);
                 var commandName = $('<div>').addClass("title").text(command["title"]);
                 commandElem.append(commandName);
 
-                if (command['title'] === 'If') {
-                    // handle if-branch commands list
-                    var repeatListElem = $('<div>').addClass('repeat-list').attr('id', 'ifExec');
-                    var ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
-                    ulListElem.sortable({
-                        receive: sortableReceiveHandle,
-                        update: sortableUpdateHandle
-                    });
-                    loadCommands(command['commands1'], ulListElem);
-                    repeatListElem.append(ulListElem);
-                    commandElem.append(repeatListElem);
-
-                    // write down Else
-                    var secondTitle = $('<div>').addClass('title-2').html('Else');
-                    commandElem.append(secondTitle);
-
-                    // handle else-branch commands list
-                    repeatListElem = $('<div>').addClass('repeat-list').attr('id', 'elseExec');
-                    ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
-                    ulListElem.sortable({
-                        receive: sortableReceiveHandle,
-                        update: sortableUpdateHandle
-                    });
-                    loadCommands(command['commands2'], ulListElem);
-                    repeatListElem.append(ulListElem);
-                    commandElem.append(repeatListElem);
-                }
                 $.each(command, function(k, v) {
-                    if (k === 'title' || k === 'commands1' || k === 'commands2') {
-                        // skip as they handled separately
-                    } else if (k === 'commands') {
-                        var repeatListElem = $('<div>').addClass('repeat-list');
+                    if (k != 'title') {
+                        var paramElem = $('<input>').attr('type', 'text').addClass('param').attr('name', k).attr('value', v);
+                        removeCommand.after(paramElem);
+                    }
+                });
+            };
+
+            function nestedLoad(command, commandElem) {
+                var removeCommand = $('<span>').addClass("glyphicon glyphicon-remove pull-right remove-command");
+                commandElem.append(removeCommand);
+
+                for (var i = 1; ; i++) {
+                    if (command['title-'+i]) {
+                        var commandName = $('<div>').addClass('title title-'+i).text(command['title-'+i]);
+                        commandElem.append(commandName);
+
+                        // handle first-nested commands list
+                        var repeatListElem = $('<div>').addClass('repeat-list').attr('id', command['id-'+i]);
                         var ulListElem = $('<ul>').addClass('connected-sortable ui-sortable');
                         ulListElem.sortable({
                             receive: sortableReceiveHandle,
                             update: sortableUpdateHandle
                         });
-                        loadCommands(v, ulListElem);
+                        loadCommands(command['commands-'+i], ulListElem);
                         repeatListElem.append(ulListElem);
                         commandElem.append(repeatListElem);
                     } else {
+                        break;
+                    }
+                }
+
+                $.each(command, function(k, v) {
+                    if (k.indexOf('commands') != 0 && k.indexOf('id') != 0 && k.indexOf('title') != 0) {
                         var paramElem = $('<input>').attr('type', 'text').addClass('param').attr('name', k).attr('value', v);
                         removeCommand.after(paramElem);
                     }
@@ -601,17 +610,17 @@ var getSequenceJson = function() {
                 insertCommand(subCommands[i], command['commands']);
             }
         } else if (command['title'] === 'If') {
-            command['commands1'] = [];
-            command['commands2'] = [];
+            command['commands'] = [];
+            command['commands-1'] = [];
             var ifSubCommands = $(elem).find('#ifExec').children('.connected-sortable').children('li');
             var elseSubCommands = $(elem).find('#elseExec').children('.connected-sortable').children('li');
 
             for (var i = 0; i < ifSubCommands.length; i++) {
-                insertCommand(ifSubCommands[i], command['commands1']);
+                insertCommand(ifSubCommands[i], command['commands']);
             }
 
             for (var i = 0; i < elseSubCommands.length; i++) {
-                insertCommand(elseSubCommands[i], command['commands2']);
+                insertCommand(elseSubCommands[i], command['commands-1']);
             }
         } else if (command['title'] === 'Forever') {
             command['commands'] = [];
