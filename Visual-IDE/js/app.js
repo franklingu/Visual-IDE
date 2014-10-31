@@ -16,30 +16,6 @@ var soundFactory = {
 };
 
 
-/***************************************************
- * create options for change-bg and change-choice *
- ***************************************************/
-$(function() {
-    var changeBgCommand = $(".template-command-container .change-bg");
-    for (var i = 0; i <= 5; i++) {
-        var option = $('<option>').html(i);
-        changeBgCommand.append(option);
-    }
-
-    var changeCostumeCommand = $(".template-command-container .change-costume");
-    for (var i = 1; i <= 8; i++) {
-        var option = $('<option>').html(i);
-        changeCostumeCommand.append(option);
-    }
-
-    var changeSoundCommand = $(".template-command-container .change-sound");
-    for (var i = 1; i <= 8; i++) {
-        var option = $('<option>').html(i);
-        changeSoundCommand.append(option);
-    }
-});
-
-
 /****************************************************
  * attching object types and events to DOM elements *
  ****************************************************/
@@ -386,41 +362,6 @@ $(function() {
                         loadCommands(v, ulListElem);
                         repeatListElem.append(ulListElem);
                         commandElem.append(repeatListElem);
-                    } else if (k === 'id') {
-                        if (command['title'] === 'Bg') {
-                            var changeBgCommand = $('<select>').addClass('param change-choice change-bg').attr('name', k);
-                            var value = parseInt(v) || 0;
-                            for (var i = 0; i <= 5; i++) {
-                                var option = $('<option>').html(i);
-                                if (value === i) {
-                                    option.attr('selected', 'selected');
-                                }
-                                changeBgCommand.append(option);
-                            }
-                            commandElem.append(changeBgCommand);
-                        } else if (command['title'] === 'Costume') {
-                            var changeCostumeCommand = $('<select>').addClass('param change-choice change-costume').attr('name', k);
-                            var value = parseInt(v) || 0;
-                            for (var i = 1; i <= 8; i++) {
-                                var option = $('<option>').html(i);
-                                if (value === i) {
-                                    option.attr('selected', 'selected');
-                                };
-                                changeCostumeCommand.append(option);
-                            }
-                            commandElem.append(changeCostumeCommand);
-                        } else if (command['title'] === 'Sound') {
-                            var changeSoundCommand = $('<select>').addClass('param change-choice change-sound').attr('name', k);
-                            var value = parseInt(v) || 0;
-                            for (var i = 1; i <= 8; i++) {
-                                var option = $('<option>').html(i);
-                                if (value === i) {
-                                    option.attr('selected', 'selected');
-                                };
-                                changeSoundCommand.append(option);
-                            }
-                            commandElem.append(changeSoundCommand);
-                        }
                     } else {
                         var paramElem = $('<input>').attr('type', 'text').addClass('param').attr('name', k).attr('value', v);
                         removeCommand.after(paramElem);
