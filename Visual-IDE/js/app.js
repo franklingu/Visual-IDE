@@ -143,7 +143,7 @@ $(function() {
 
     $("#feedbackArea").droppable();
 
-    $('#sortable2').on('change', 'input', function() {
+    $('#programList').on('change', 'input', function() {
         if (!isExpressionValid($(this).val())) {
             // TODO: change to tooltip or also with help of red highlighting
             console.log('invalid input');
@@ -532,9 +532,9 @@ $(function() {
             'While' : nestedLoad
         };
         if (objStr) {
-            $('#sortable2').empty();
+            $('#programList').empty();
             var commands = JSON.parse(objStr);
-            var container = $('#sortable2');
+            var container = $('#programList');
             loadCommands(commands.data, container);
 
             function loadCommands(commands, container) {
@@ -753,7 +753,7 @@ var getSequenceJson = function() {
         }
         obj.push(command);
     }
-    var commands = $('#sortable2').children("li");
+    var commands = $('#programList').children("li");
     var json = [];
     for (var i = 0; i < commands.length; i++) {
         insertCommand(commands[i], json);
