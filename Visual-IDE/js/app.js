@@ -167,6 +167,13 @@ $(function() {
         shouldStopExecution = true;
     });
 
+    $('#resetButton').on('click', function() {
+        if ($('#playButton').hasClass('unclickable')) {
+            return;
+        }
+        $('#programList').empty();
+    });
+
     $('body').on('click', '.remove-command', function() {
         $(this).closest('.command-container').remove();
         var obj = getSequenceJson();

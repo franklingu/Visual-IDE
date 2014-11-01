@@ -139,8 +139,12 @@
 }
 
 #playButton {
-  color: #ede275;
+  color: #0c0;
 }
+
+  #playButton:hover {
+    color: #080;
+  }
 
 #stopButton {
   color: #c00;
@@ -150,9 +154,13 @@
     color: #800;
   }
 
-#playButton:hover {
-  color: #bab042;
+#resetButton {
+  color: #ede275;
 }
+
+  #resetButton:hover {
+    color: #bab042;
+  }
 
 #playButton:active, #stopButton:active {
   color: white;
