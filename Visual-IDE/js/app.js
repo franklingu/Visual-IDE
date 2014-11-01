@@ -385,41 +385,41 @@ var execute = function(command, commands, idx) {
     function repeat(command, commands, idx) {
         var repeatTimes = evalExpression(command['iterations']) | 0;
         var repeatedTimesSoFar = 0;
-        command['commands']['executeNext'] = function(repeatIdx) {
-            if (repeatIdx < command['commands'].length && !shouldStopExecution) {
-                execute(command['commands'][repeatIdx], command['commands'], repeatIdx);
+        command['commands-1']['executeNext'] = function(repeatIdx) {
+            if (repeatIdx < command['commands-1'].length && !shouldStopExecution) {
+                execute(command['commands-1'][repeatIdx], command['commands-1'], repeatIdx);
             } else {
                 repeatedTimesSoFar++;
                 if (repeatedTimesSoFar < repeatTimes && !shouldStopExecution) {
-                    execute(command['commands'][0], command['commands'], 0);
+                    execute(command['commands-1'][0], command['commands-1'], 0);
                 } else {
                     repeatedTimesSoFar = 0;
                     commands.executeNext(idx + 1);
                 }
             }
         };
-        if (command['commands'].length > 0 && repeatTimes > 0) {
-            execute(command['commands'][0], command['commands'], 0);
+        if (command['commands-1'].length > 0 && repeatTimes > 0) {
+            execute(command['commands-1'][0], command['commands-1'], 0);
         } else {
             commands.executeNext(idx + 1);
         }
     }
 
     function forever(command, commands, idx) {
-        command['commands']['executeNext'] = function(repeatIdx) {
+        command['commands-1']['executeNext'] = function(repeatIdx) {
             if (shouldStopExecution) {
                 shouldStopExecution = false;
                 commands.executeNext(idx + 1);
                 return;
             }
-            if (repeatIdx < command['commands'].length) {
-                execute(command['commands'][repeatIdx], command['commands'], repeatIdx);
+            if (repeatIdx < command['commands-1'].length) {
+                execute(command['commands-1'][repeatIdx], command['commands-1'], repeatIdx);
             } else {
-                execute(command['commands'][0], command['commands'], 0);
+                execute(command['commands-1'][0], command['commands-1'], 0);
             }
         };
-        if (command['commands'].length > 0) {
-            execute(command['commands'][0], command['commands'], 0);
+        if (command['commands-1'].length > 0) {
+            execute(command['commands-1'][0], command['commands-1'], 0);
         } else {
             commands.executeNext(idx + 1);
         }
@@ -428,9 +428,10 @@ var execute = function(command, commands, idx) {
     function ifElse(command, commands, idx) {
         var rawResult = evalExpression(command['condition']);
         var condition = (typeof rawResult === 'boolean' && rawResult) || false;
-        var branchToTake = condition ? 'commands' : 'commands-1';
+        var branchToTake = condition ? 'commands-1' : 'commands-2';
         command[branchToTake]['executeNext'] = function(ifElseIdx) {
             if (ifElseIdx < command[branchToTake].length && !shouldStopExecution) {
+                alert(command[branchToTake][ifElseIdx]['title']);
                 execute(command[branchToTake][ifElseIdx], command[branchToTake], ifElseIdx);
             } else {
                 commands.executeNext(idx + 1);
@@ -477,7 +478,7 @@ var execute = function(command, commands, idx) {
     function whileHandle(command, commands, idx) {
         var rawResult = evalExpression(command['condition']);
         var condition = (typeof rawResult === 'boolean' && rawResult) || false;
-        command['commands']['executeNext'] = function (repeatIdx) {
+        command['commands-1']['executeNext'] = function (repeatIdx) {
             if (shouldStopExecution) {
                 shouldStopExecution = false;
                 commands.executeNext(idx + 1);
@@ -485,16 +486,16 @@ var execute = function(command, commands, idx) {
             }
             rawResult = evalExpression(command['condition']);
             condition = (typeof rawResult === 'boolean' && rawResult) || false;
-            if (repeatIdx < command['commands'].length) {
-                execute(command['commands'][repeatIdx], command['commands'], repeatIdx);
+            if (repeatIdx < command['commands-1'].length) {
+                execute(command['commands-1'][repeatIdx], command['commands-1'], repeatIdx);
             } else if (condition) {
-                execute(command['commands'][0], command['commands'], 0);
+                execute(command['commands-1'][0], command['commands-1'], 0);
             } else {
                 commands.executeNext(idx + 1);
             }
         };
-        if (command['commands'].length > 0 && condition) {
-            execute(command['commands'][0], command['commands'], 0);
+        if (command['commands-1'].length > 0 && condition) {
+            execute(command['commands-1'][0], command['commands-1'], 0);
         } else {
             commands.executeNext(idx + 1);
         }
@@ -578,6 +579,7 @@ $(function() {
                 }
 
                 $.each(command, function(k, v) {
+                    // if this param does not start with 'commands', 'id' or 'title'
                     if (k.indexOf('commands') != 0 && k.indexOf('id') != 0 && k.indexOf('title') != 0) {
                         var paramElem = $('<input>').attr('type', 'text').addClass('param').attr('name', k).attr('value', v);
 
