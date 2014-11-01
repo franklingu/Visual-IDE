@@ -733,8 +733,8 @@ var getSequenceJson = function() {
             command['title-2'] = 'Else';
             command['commands-1'] = [];
             command['commands-2'] = [];
-            var ifSubCommands = $(elem).find('.sub-list-1').children('.connected-sortable').children('li');
-            var elseSubCommands = $(elem).find('.sub-list-2').children('.connected-sortable').children('li');
+            var ifSubCommands = $(elem).find('.sub-list-1').first().children('.connected-sortable').children('li');
+            var elseSubCommands = $(elem).find('.sub-list-2').first().children('.connected-sortable').children('li');
 
             for (var i = 0; i < ifSubCommands.length; i++) {
                 insertCommand(ifSubCommands[i], command['commands-1']);
