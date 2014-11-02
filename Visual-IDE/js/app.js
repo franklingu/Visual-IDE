@@ -421,14 +421,10 @@ var execute = function(command, commands, idx) {
                 commands.executeNext(idx + 1);
                 return;
             }
-            try {
-                if (repeatIdx < command['commands-1'].length) {
-                    execute(command['commands-1'][repeatIdx], command['commands-1'], repeatIdx);
-                } else {
-                    execute(command['commands-1'][0], command['commands-1'], 0);
-                }
-            } catch(err) {
-                alert('function chain size exceeds');
+            if (repeatIdx < command['commands-1'].length) {
+                execute(command['commands-1'][repeatIdx], command['commands-1'], repeatIdx);
+            } else {
+                setTimeout(execute(command['commands-1'][0], command['commands-1'], 0), 20);
             }
         };
         if (command['commands-1'].length > 0) {
@@ -472,7 +468,7 @@ var execute = function(command, commands, idx) {
         var rotateStr = 'rotate(' + rotateDegree + 'deg)';
         $('.sprite').css('-webkit-transform', rotateStr).css('-moz-transform', rotateStr).css('-ms-transform',
             rotateStr).css('-o-transform', rotateStr).css('transform', rotateStr);
-        $('.sprite').fadeIn('fast', function() {
+        $('.sprite').fadeTo('fast', 1, function() {
             commands.executeNext(idx + 1);
         });
     }
