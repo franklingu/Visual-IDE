@@ -417,14 +417,13 @@ var execute = function(command, commands, idx) {
     function forever(command, commands, idx) {
         command['commands-1']['executeNext'] = function(repeatIdx) {
             if (shouldStopExecution) {
-                shouldStopExecution = false;
                 commands.executeNext(idx + 1);
                 return;
             }
             if (repeatIdx < command['commands-1'].length) {
                 execute(command['commands-1'][repeatIdx], command['commands-1'], repeatIdx);
             } else {
-                setTimeout(execute(command['commands-1'][0], command['commands-1'], 0), 20);
+                setTimeout(execute(command['commands-1'][0], command['commands-1'], 0), 0);
             }
         };
         if (command['commands-1'].length > 0) {
@@ -488,7 +487,6 @@ var execute = function(command, commands, idx) {
         var condition = (typeof rawResult === 'boolean' && rawResult) || false;
         command['commands-1']['executeNext'] = function (repeatIdx) {
             if (shouldStopExecution) {
-                shouldStopExecution = false;
                 commands.executeNext(idx + 1);
                 return ;
             }
