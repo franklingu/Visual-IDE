@@ -39,6 +39,8 @@ $(function() {
         mousePosition.x = event.pageX;
         mousePosition.y = event.pageY;
     });
+
+    $()
 });
 
 /****************************************************
@@ -182,6 +184,16 @@ $(function() {
         $.cookie('cachedProject', JSON.stringify(obj));
     });
 
+    $('body').on('keyup', function(event) {
+        if (event.which == 80) { // pressed 'p'
+            $('#playButton').click();
+        } else if (event.which == 83) { // pressed 's'
+            $('#stopButton').click();
+        } else if (event.which == 82) { // pressed 'r'
+            $('#resetButton').click();
+        }
+    });
+
     $("[rel='tooltip']").tooltip({
         html:true,
         placement: 'bottom',
@@ -309,7 +321,7 @@ var commandExecutor = function(command, nextCommandFn, idx) {
         'SetAngle': setAngle,
         'While': whileHandle
     };
-    
+
     var commandName = command['title'];
 
     var commandHandler = commandFactory[commandName];
