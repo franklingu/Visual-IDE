@@ -726,27 +726,18 @@ var getSequenceJson = function() {
         params.each(function() {
             command[$(this).attr('name')] = $(this).val();
         });
-        if (command['title'] === 'Repeat' || command['title'] === 'Forever' || command['title'] === 'While') {
-            command['title-1'] = command['title'];
-            command['commands-1'] = [];
-            var subCommands = $(elem).children('.command').children('.repeat-list').children('.connected-sortable').children('li');
-            for (var i = 0; i < subCommands.length; i++) {
-                insertCommand(subCommands[i], command['commands-1']);
-            }
-        } else if (command['title'] === 'If') {
-            command['title-1'] = 'If';
-            command['title-2'] = 'Else';
-            command['commands-1'] = [];
-            command['commands-2'] = [];
-            var ifSubCommands = $(elem).find('.sub-list-1').first().children('.connected-sortable').children('li');
-            var elseSubCommands = $(elem).find('.sub-list-2').first().children('.connected-sortable').children('li');
 
-            for (var i = 0; i < ifSubCommands.length; i++) {
-                insertCommand(ifSubCommands[i], command['commands-1']);
-            }
-
-            for (var i = 0; i < elseSubCommands.length; i++) {
-                insertCommand(elseSubCommands[i], command['commands-2']);
+        // add the nested blocks if they exist
+        for (var i = 1; ; i++) {
+            if ($(elem).children('.command').children('.title-'+i).html()) {
+                command['title-'+i] = $(elem).children('.command').children('.title-'+i).html();
+                command['commands-'+i] = [];
+                var subCommands = $(elem).children('.command').children('.sub-list-'+i).children('.connected-sortable').children('li');
+                for (var j = 0; j < subCommands.length; j++) {
+                    insertCommand(subCommands[j], command['commands-'+i]);
+                }
+            } else {
+                break;
             }
         }
         obj.push(command);
