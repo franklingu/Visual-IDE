@@ -270,7 +270,7 @@ var startCommandExecution = function(commands) {
         }
 
         if (idx < commands.length && !shouldStopExecution) {
-            execute(commands[idx], commands['executeNext'], idx);
+            commandExecutor(commands[idx], commands['executeNext'], idx);
         } else if (commands.length === 0) {
             shouldStopExecution = false;
             $('#playButton').removeClass('unclickable');
@@ -284,15 +284,15 @@ var startCommandExecution = function(commands) {
         }
     };
     if (commands.length > 0) {
-        execute(commands[0], commands['executeNext'], 0);
+        commandExecutor(commands[0], commands['executeNext'], 0);
     }
 };
 
-var execute = function(command, nextCommandFn, idx) {
+var commandExecutor = function(command, nextCommandFn, idx) {
     if (!command) {
         return ;
     }
-    var commandName = command['title'];
+
     var commandFactory = {
         'SetX': setX,
         'SetY': setY,
@@ -309,10 +309,12 @@ var execute = function(command, nextCommandFn, idx) {
         'SetAngle': setAngle,
         'While': whileHandle
     };
+    
+    var commandName = command['title'];
 
-    var commandExecutor = commandFactory[commandName];
-    if (commandExecutor) {
-        commandExecutor(command, nextCommandFn, idx);
+    var commandHandler = commandFactory[commandName];
+    if (commandHandler) {
+        commandHandler(command, nextCommandFn, idx);
     } else {
         console.log('Not implemented');
     }
@@ -423,11 +425,11 @@ var execute = function(command, nextCommandFn, idx) {
                 nextCommandFn(idx, true);
             }
             if (repeatIdx < command['commands-1'].length) {
-                execute(command['commands-1'][repeatIdx], command['commands-1']['executeNext'], repeatIdx);
+                commandExecutor(command['commands-1'][repeatIdx], command['commands-1']['executeNext'], repeatIdx);
             } else {
                 repeatedTimesSoFar++;
                 if (repeatedTimesSoFar < repeatTimes) {
-                    execute(command['commands-1'][0], command['commands-1']['executeNext'], 0);
+                    commandExecutor(command['commands-1'][0], command['commands-1']['executeNext'], 0);
                 } else {
                     repeatedTimesSoFar = 0;
                     nextCommandFn(idx + 1);
@@ -435,7 +437,7 @@ var execute = function(command, nextCommandFn, idx) {
             }
         };
         if (command['commands-1'].length > 0 && repeatTimes > 0) {
-            execute(command['commands-1'][0], command['commands-1']['executeNext'], 0);
+            commandExecutor(command['commands-1'][0], command['commands-1']['executeNext'], 0);
         } else {
             nextCommandFn(idx, true);
         }
@@ -457,13 +459,13 @@ var execute = function(command, nextCommandFn, idx) {
                 nextCommandFn(idx, true);
             }
             if (repeatIdx < command['commands-1'].length) {
-                execute(command['commands-1'][repeatIdx], command['commands-1']['executeNext'], repeatIdx);
+                commandExecutor(command['commands-1'][repeatIdx], command['commands-1']['executeNext'], repeatIdx);
             } else {
-                execute(command['commands-1'][0], command['commands-1']['executeNext'], 0);
+                commandExecutor(command['commands-1'][0], command['commands-1']['executeNext'], 0);
             }
         };
         if (command['commands-1'].length > 0) {
-            execute(command['commands-1'][0], command['commands-1']['executeNext'], 0);
+            commandExecutor(command['commands-1'][0], command['commands-1']['executeNext'], 0);
         } else {
             nextCommandFn(idx, true);
         }
@@ -484,13 +486,13 @@ var execute = function(command, nextCommandFn, idx) {
                 nextCommandFn(idx, true);
             }
             if (ifElseIdx < command[branchToTake].length && !shouldStopExecution) {
-                execute(command[branchToTake][ifElseIdx], command[branchToTake]['executeNext'], ifElseIdx);
+                commandExecutor(command[branchToTake][ifElseIdx], command[branchToTake]['executeNext'], ifElseIdx);
             } else {
                 nextCommandFn(idx + 1);
             }
         };
         if (command[branchToTake].length > 0) {
-            execute(command[branchToTake][0], command[branchToTake]['executeNext'], 0);
+            commandExecutor(command[branchToTake][0], command[branchToTake]['executeNext'], 0);
         } else {
             nextCommandFn(idx, true);
         }
@@ -547,15 +549,15 @@ var execute = function(command, nextCommandFn, idx) {
             rawResult = evalExpression(command['condition']);
             condition = (typeof rawResult === 'boolean' && rawResult) || false;
             if (repeatIdx < command['commands-1'].length) {
-                execute(command['commands-1'][repeatIdx], command['commands-1']['executeNext'], repeatIdx);
+                commandExecutor(command['commands-1'][repeatIdx], command['commands-1']['executeNext'], repeatIdx);
             } else if (condition) {
-                execute(command['commands-1'][0], command['commands-1']['executeNext'], 0);
+                commandExecutor(command['commands-1'][0], command['commands-1']['executeNext'], 0);
             } else {
                 nextCommandFn(idx + 1);
             }
         };
         if (command['commands-1'].length > 0 && condition) {
-            execute(command['commands-1'][0], command['commands-1']['executeNext'], 0);
+            commandExecutor(command['commands-1'][0], command['commands-1']['executeNext'], 0);
         } else {
             nextCommandFn(idx, true);
         }
