@@ -13,6 +13,10 @@ handlers:
   static_dir: img
   mime_type: "image/png"
 
+- url: /lib/css/images
+  static_dir: lib/css/images
+  mime_type: "image/png"
+
 - url: /lib/js
   static_dir: lib/js
   mime_type: "text/javascript"
