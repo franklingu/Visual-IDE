@@ -262,9 +262,15 @@ var evalExpression = function(expression) {
  * Command execution *
  *********************/
 var startCommandExecution = function(commands) {
-    commands['executeNext'] = function(idx) {
+    commands['executeNext'] = function(idx, removeChild) {
+        removeChild = typeof removeChild !== 'undefined' ? removeChild : false;
+
+        if (removeChild) {
+            commands.splice(idx, 1);
+        }
+
         if (idx < commands.length && !shouldStopExecution) {
-            execute(commands[idx], commands, idx);
+            execute(commands[idx], commands['executeNext'], idx);
         } else if (commands.length === 0) {
             shouldStopExecution = false;
             $('#playButton').removeClass('unclickable');
@@ -278,11 +284,11 @@ var startCommandExecution = function(commands) {
         }
     };
     if (commands.length > 0) {
-        execute(commands[0], commands, 0);
+        execute(commands[0], commands['executeNext'], 0);
     }
 };
 
-var execute = function(command, commands, idx) {
+var execute = function(command, nextCommandFn, idx) {
     if (!command) {
         return ;
     }
@@ -306,12 +312,12 @@ var execute = function(command, commands, idx) {
 
     var commandExecutor = commandFactory[commandName];
     if (commandExecutor) {
-        commandExecutor(command, commands, idx);
+        commandExecutor(command, nextCommandFn, idx);
     } else {
         console.log('Not implemented');
     }
 
-    function setX(command, commands, idx) {
+    function setX(command, nextCommandFn, idx) {
         var value = evalExpression(command['value']) | 0;
         var x = SPRITE_CENTER_X + value;
         x = x > SPRITE_MAX_X ? SPRITE_MAX_X : x;
@@ -320,12 +326,12 @@ var execute = function(command, commands, idx) {
         $(".sprite").animate({
             left: x
         }, function() {
-            commands.executeNext(idx + 1);
+            nextCommandFn(idx + 1);
         });
     }
 
 
-    function setY(command, commands, idx) {
+    function setY(command, nextCommandFn, idx) {
         var value = evalExpression(command['value']) | 0;
         var x = SPRITE_CENTER_Y - value;
         x = x > SPRITE_MAX_Y ? SPRITE_MAX_Y : x;
@@ -334,23 +340,23 @@ var execute = function(command, commands, idx) {
         $(".sprite").animate({
             top: x
         }, function() {
-            commands.executeNext(idx + 1);
+            nextCommandFn(idx + 1);
         });
     }
 
-    function show(command, commands, idx) {
+    function show(command, nextCommandFn, idx) {
         $(".sprite").fadeTo("fast", 1, function() {
-            commands.executeNext(idx + 1);
+            nextCommandFn(idx + 1);
         });
     }
 
-    function hide(command, commands, idx) {
+    function hide(command, nextCommandFn, idx) {
         $(".sprite").fadeTo("fast", 0, function() {
-            commands.executeNext(idx + 1);
+            nextCommandFn(idx + 1);
         });
     }
 
-    function move(command, commands, idx) {
+    function move(command, nextCommandFn, idx) {
         var currX = $('#feedbackArea .sprite').position().left;
         var currY = $('#feedbackArea .sprite').position().top;
         var moveAmt = evalExpression(command['amount']) | 0;
@@ -369,11 +375,11 @@ var execute = function(command, commands, idx) {
             left: nextX,
             top: nextY
         }, function() {
-            commands.executeNext(idx + 1);
+            nextCommandFn(idx + 1);
         });
     }
 
-    function changeCostume(command, commands, idx) {
+    function changeCostume(command, nextCommandFn, idx) {
         var id = evalExpression(command['id']) | 0;
         id = ((id % NUM_COSTUMES) + NUM_COSTUMES) % NUM_COSTUMES;
         var imagePath = '/img/cat_' + id + '.png';
@@ -382,11 +388,11 @@ var execute = function(command, commands, idx) {
         sprite.css('display', 'hidden');
         sprite.attr('src', imagePath);
         sprite.fadeTo('fast', 1, function() {
-            commands.executeNext(idx + 1);
+            nextCommandFn(idx + 1);
         });
     }
 
-    function changeBg(command, commands, idx) {
+    function changeBg(command, nextCommandFn, idx) {
         var id = (evalExpression(command['id']) | 0);
         id = ((id % NUM_BACKGROUNDS) + NUM_BACKGROUNDS) % NUM_BACKGROUNDS;
         var currBg = $('.bg-image');
@@ -394,148 +400,164 @@ var execute = function(command, commands, idx) {
         currBg.css('display', 'hidden');
         currBg.attr('src', imagePath);
         currBg.fadeTo("fast", 1, function() {
-            commands.executeNext(idx + 1);
+            nextCommandFn(idx + 1);
         });
     }
 
-    function repeat(command, commands, idx) {
+    function repeat(command, nextCommandFn, idx) {
         var repeatTimes = evalExpression(command['iterations']) | 0;
         var repeatedTimesSoFar = 0;
-        command['commands-1']['executeNext'] = function(repeatIdx) {
+        command['commands-1']['executeNext'] = function(repeatIdx, removeChild) {
+            removeChild = typeof removeChild !== 'undefined' ? removeChild : false;
+
+            if (removeChild) {
+                command['commands-1'].splice(repeatIdx, 1);
+            }
+
             if (shouldStopExecution) {
                 shouldStopExecution = false;
-                commands.executeNext(idx + 1);
+                nextCommandFn(idx + 1);
                 return;
             }
             if (command['commands-1'].length === 0) {
-                commands.splice(idx, 1);
-                commands.executeNext(idx);
+                nextCommandFn(idx, true);
             }
             if (repeatIdx < command['commands-1'].length) {
-                execute(command['commands-1'][repeatIdx], command['commands-1'], repeatIdx);
+                execute(command['commands-1'][repeatIdx], command['commands-1']['executeNext'], repeatIdx);
             } else {
                 repeatedTimesSoFar++;
                 if (repeatedTimesSoFar < repeatTimes) {
-                    execute(command['commands-1'][0], command['commands-1'], 0);
+                    execute(command['commands-1'][0], command['commands-1']['executeNext'], 0);
                 } else {
                     repeatedTimesSoFar = 0;
-                    commands.executeNext(idx + 1);
+                    nextCommandFn(idx + 1);
                 }
             }
         };
         if (command['commands-1'].length > 0 && repeatTimes > 0) {
-            execute(command['commands-1'][0], command['commands-1'], 0);
+            execute(command['commands-1'][0], command['commands-1']['executeNext'], 0);
         } else {
-            commands.splice(idx, 1);
-            commands.executeNext(idx);
+            nextCommandFn(idx, true);
         }
     }
 
-    function forever(command, commands, idx) {
-        command['commands-1']['executeNext'] = function(repeatIdx) {
+    function forever(command, nextCommandFn, idx) {
+        command['commands-1']['executeNext'] = function(repeatIdx, removeChild) {
+            removeChild = typeof removeChild !== 'undefined' ? removeChild : false;
+
+            if (removeChild) {
+                command['commands-1'].splice(repeatIdx, 1);
+            }
+
             if (shouldStopExecution) {
-                commands.executeNext(idx + 1);
+                nextCommandFn(idx + 1);
                 return;
             }
             if (command['commands-1'].length === 0) {
-                commands.splice(idx, 1);
-                commands.executeNext(idx);
+                nextCommandFn(idx, true);
             }
             if (repeatIdx < command['commands-1'].length) {
-                execute(command['commands-1'][repeatIdx], command['commands-1'], repeatIdx);
+                execute(command['commands-1'][repeatIdx], command['commands-1']['executeNext'], repeatIdx);
             } else {
-                execute(command['commands-1'][0], command['commands-1'], 0);
+                execute(command['commands-1'][0], command['commands-1']['executeNext'], 0);
             }
         };
         if (command['commands-1'].length > 0) {
-            execute(command['commands-1'][0], command['commands-1'], 0);
+            execute(command['commands-1'][0], command['commands-1']['executeNext'], 0);
         } else {
-            commands.splice(idx, 1);
-            commands.executeNext(idx);
+            nextCommandFn(idx, true);
         }
     }
 
-    function ifElse(command, commands, idx) {
+    function ifElse(command, nextCommandFn, idx) {
         var rawResult = evalExpression(command['condition']);
         var condition = (typeof rawResult === 'boolean' && rawResult) || false;
         var branchToTake = condition ? 'commands-1' : 'commands-2';
-        command[branchToTake]['executeNext'] = function(ifElseIdx) {
+        command[branchToTake]['executeNext'] = function(ifElseIdx, removeChild) {
+            removeChild = typeof removeChild !== 'undefined' ? removeChild : false;
+
+            if (removeChild) {
+                command['commands-1'].splice(ifElseIdx, 1);
+            }
+
             if (command[branchToTake].length === 0) {
-                commands.splice(idx, 1);
-                commands.executeNext(idx);
+                nextCommandFn(idx, true);
             }
             if (ifElseIdx < command[branchToTake].length && !shouldStopExecution) {
-                execute(command[branchToTake][ifElseIdx], command[branchToTake], ifElseIdx);
+                execute(command[branchToTake][ifElseIdx], command[branchToTake]['executeNext'], ifElseIdx);
             } else {
-                commands.executeNext(idx + 1);
+                nextCommandFn(idx + 1);
             }
         };
         if (command[branchToTake].length > 0) {
-            execute(command[branchToTake][0], command[branchToTake], 0);
+            execute(command[branchToTake][0], command[branchToTake]['executeNext'], 0);
         } else {
-            commands.splice(idx, 1);
-            commands.executeNext(idx);
+            nextCommandFn(idx, true);
         }
     }
 
-    function playSound(command, commands, idx) {
+    function playSound(command, nextCommandFn, idx) {
         var soundIdx = evalExpression(command['id']) || 0;
         soundIdx = ((soundIdx + NUM_SOUNDS) % NUM_SOUNDS);
         var soundToPlay = soundFactory[soundIdx];
         $(soundToPlay).on('ended', function() {
             $(soundToPlay).unbind('ended');
-            commands.executeNext(idx + 1);
+            nextCommandFn(idx + 1);
         });
         soundToPlay.play();
     }
 
-    function rotate(command, commands, idx) {
+    function rotate(command, nextCommandFn, idx) {
         var rotateDegree = parseFloat(command['id']) + getRotationDegrees($('#feedbackArea .sprite'));
         var rotateStr = 'rotate(' + rotateDegree + 'deg)';
         $('.sprite').css('-webkit-transform', rotateStr).css('-moz-transform', rotateStr).css('-ms-transform',
             rotateStr).css('-o-transform', rotateStr).css('transform', rotateStr);
         $('.sprite').fadeTo('fast', 1, function() {
-            commands.executeNext(idx + 1);
+            nextCommandFn(idx + 1);
         });
     }
 
-    function setAngle(command, commands, idx) {
+    function setAngle(command, nextCommandFn, idx) {
         var rotateDegree = parseFloat(command['id']);
         var rotateStr = 'rotate(' + rotateDegree + 'deg)';
         $('.sprite').css('-webkit-transform', rotateStr).css('-moz-transform', rotateStr).css('-ms-transform',
             rotateStr).css('-o-transform', rotateStr).css('transform', rotateStr);
         $('.sprite').fadeTo('fast', 1, function() {
-            commands.executeNext(idx + 1);
+            nextCommandFn(idx + 1);
         });
     }
 
-    function whileHandle(command, commands, idx) {
+    function whileHandle(command, nextCommandFn, idx) {
         var rawResult = evalExpression(command['condition']);
         var condition = (typeof rawResult === 'boolean' && rawResult) || false;
-        command['commands-1']['executeNext'] = function (repeatIdx) {
+        command['commands-1']['executeNext'] = function (repeatIdx, removeChild) {
+            removeChild = typeof removeChild !== 'undefined' ? removeChild : false;
+
+            if (removeChild) {
+                command['commands-1'].splice(repeatIdx, 1);
+            }
+
             if (shouldStopExecution) {
-                commands.executeNext(idx + 1);
+                nextCommandFn(idx + 1);
                 return ;
             }
             if (command['commands-1'].length === 0) {
-                commands.splice(idx, 1);
-                commands.executeNext(idx);
+                nextCommandFn(idx, true);
             }
             rawResult = evalExpression(command['condition']);
             condition = (typeof rawResult === 'boolean' && rawResult) || false;
             if (repeatIdx < command['commands-1'].length) {
-                execute(command['commands-1'][repeatIdx], command['commands-1'], repeatIdx);
+                execute(command['commands-1'][repeatIdx], command['commands-1']['executeNext'], repeatIdx);
             } else if (condition) {
-                execute(command['commands-1'][0], command['commands-1'], 0);
+                execute(command['commands-1'][0], command['commands-1']['executeNext'], 0);
             } else {
-                commands.executeNext(idx + 1);
+                nextCommandFn(idx + 1);
             }
         };
         if (command['commands-1'].length > 0 && condition) {
-            execute(command['commands-1'][0], command['commands-1'], 0);
+            execute(command['commands-1'][0], command['commands-1']['executeNext'], 0);
         } else {
-            commands.splice(idx, 1);
-            commands.executeNext(idx);
+            nextCommandFn(idx, true);
         }
     }
 };
