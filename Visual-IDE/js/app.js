@@ -373,7 +373,7 @@ var execute = function(command, commands, idx) {
         var sprite = $('.sprite');
         sprite.css('display', 'hidden');
         sprite.attr('src', imagePath);
-        sprite.fadeIn('fast', function() {
+        sprite.fadeTo('fast', 1, function() {
             commands.executeNext(idx + 1);
         });
     }
@@ -385,10 +385,9 @@ var execute = function(command, commands, idx) {
         var imagePath = '/img/bg_' + id + '.jpg';
         currBg.css('display', 'hidden');
         currBg.attr('src', imagePath);
-        $(".bg-image").fadeIn("fast", function() {
+        currBg.fadeTo("fast", 1, function() {
             commands.executeNext(idx + 1);
         });
-
     }
 
     function repeat(command, commands, idx) {
@@ -477,7 +476,7 @@ var execute = function(command, commands, idx) {
         var rotateStr = 'rotate(' + rotateDegree + 'deg)';
         $('.sprite').css('-webkit-transform', rotateStr).css('-moz-transform', rotateStr).css('-ms-transform',
             rotateStr).css('-o-transform', rotateStr).css('transform', rotateStr);
-        $('.sprite').fadeIn('fast', function() {
+        $('.sprite').fadeTo('fast', 1, function() {
             commands.executeNext(idx + 1);
         });
     }
