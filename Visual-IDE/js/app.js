@@ -172,6 +172,8 @@ $(function() {
             return;
         }
         $('#programList').empty();
+        var obj = getSequenceJson();
+        $.cookie('cachedProject', JSON.stringify(obj));
     });
 
     $('body').on('click', '.remove-command', function() {
