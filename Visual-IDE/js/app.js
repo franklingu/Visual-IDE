@@ -419,10 +419,14 @@ var execute = function(command, commands, idx) {
                 commands.executeNext(idx + 1);
                 return;
             }
-            if (repeatIdx < command['commands-1'].length) {
-                execute(command['commands-1'][repeatIdx], command['commands-1'], repeatIdx);
-            } else {
-                execute(command['commands-1'][0], command['commands-1'], 0);
+            try {
+                if (repeatIdx < command['commands-1'].length) {
+                    execute(command['commands-1'][repeatIdx], command['commands-1'], repeatIdx);
+                } else {
+                    execute(command['commands-1'][0], command['commands-1'], 0);
+                }
+            } catch(err) {
+                alert('function chain size exceeds');
             }
         };
         if (command['commands-1'].length > 0) {
@@ -438,7 +442,6 @@ var execute = function(command, commands, idx) {
         var branchToTake = condition ? 'commands-1' : 'commands-2';
         command[branchToTake]['executeNext'] = function(ifElseIdx) {
             if (ifElseIdx < command[branchToTake].length && !shouldStopExecution) {
-                alert(command[branchToTake][ifElseIdx]['title']);
                 execute(command[branchToTake][ifElseIdx], command[branchToTake], ifElseIdx);
             } else {
                 commands.executeNext(idx + 1);
