@@ -191,23 +191,23 @@ $(function() {
 });
 
 var autocompleteOverride = function(event, ui) {
-            var fullInput = ($(this).val());
-            var words = fullInput.split(' ');
-            var lastWord = words[words.length - 1];
-            var partialInput = fullInput.substring(0, fullInput.length - lastWord.length);
-            if (lastWord.length > 1) {
-                for (var i = 0; i = ui.content.length; i++) {
-                    ui.content.pop();
-                }
-                $.each(VAR_NAMES, function(index, value) {
-                    if (value.indexOf(lastWord) == 0)
-                        ui.content.push({
-                            label: value,
-                            value: partialInput + value
-                        });
+    var fullInput = ($(this).val());
+    var words = fullInput.split(' ');
+    var lastWord = words[words.length - 1];
+    var partialInput = fullInput.substring(0, fullInput.length - lastWord.length);
+    if (lastWord.length > 1) {
+        for (var i = 0; i = ui.content.length; i++) {
+            ui.content.pop();
+        }
+        $.each(VAR_NAMES, function(index, value) {
+            if (value.indexOf(lastWord) == 0)
+                ui.content.push({
+                    label: value,
+                    value: partialInput + value
                 });
-            }
-        };
+        });
+    }
+};
 
 var preprocessExpression = function(expression) {
     var currX = ($('.sprite').position().left - SPRITE_CENTER_X).toString();
