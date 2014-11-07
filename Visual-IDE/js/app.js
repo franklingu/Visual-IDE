@@ -308,13 +308,11 @@ var startCommandExecution = function(commands) {
             shouldStopExecution = false;
             $('#playButton').removeClass('unclickable');
             $('.current-command').removeClass('current-command');
-            console.log('Done with execution');
             return;
         } else {
             shouldStopExecution = false;
             $('#playButton').removeClass('unclickable');
             $('.current-command').removeClass('current-command');
-            console.log('Done with execution');
             return;
         }
     };
