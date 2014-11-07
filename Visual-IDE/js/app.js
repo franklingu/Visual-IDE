@@ -206,7 +206,6 @@ $(function() {
 
     $('#speed-control').slider({
         animate: 'true',
-        range: 'true',
         min: 0,
         max: 1600,
         value: 1600,
@@ -215,6 +214,12 @@ $(function() {
         }
 
     });
+
+    $('.ui-slider-handle').tooltip({
+        appendTo: 'body',
+        placement: 'bottom',
+        title: 'Drag this to adjust speed of execution'
+    })
 
 });
 
