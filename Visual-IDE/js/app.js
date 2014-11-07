@@ -185,11 +185,11 @@ $(function() {
     });
 
     $('body').on('keyup', function(event) {
-        if (event.which == 80) { // pressed 'p'
+        if (event.which == 80 && event.altKey) { // pressed 'p'
             $('#playButton').click();
-        } else if (event.which == 83) { // pressed 's'
+        } else if (event.which == 83 && event.altKey) { // pressed 's'
             $('#stopButton').click();
-        } else if (event.which == 82) { // pressed 'r'
+        } else if (event.which == 82 && event.altKey) { // pressed 'r'
             $('#resetButton').click();
         }
     });
