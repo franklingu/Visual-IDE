@@ -19,6 +19,7 @@ var VAR_NAMES = [
 
 
 var shouldStopExecution = false;
+var animationDuration = 400;
 var soundFactory = {
     0: new Audio('sound/woosh.wav'),
     1: new Audio('sound/banana_slap.wav'),
@@ -33,6 +34,9 @@ var mousePosition = {
     x: 0,
     y: 0
 };
+
+// A running index that is assigned to every command dropped in the program panel
+var commandId = 0;
 
 $(function() {
     $('#feedbackArea').mousemove(function(event) {
@@ -200,6 +204,18 @@ $(function() {
         appendTo: 'body'
     });
 
+    $('#speed-control').slider({
+        animate: 'true',
+        range: 'true',
+        min: 0,
+        max: 1600,
+        value: 1600,
+        stop: function(event, ui){
+            animationDuration = 400 + (1600-ui.value);
+        }
+
+    });
+
 });
 
 var autocompleteOverride = function(event, ui) {
@@ -225,8 +241,12 @@ var preprocessExpression = function(expression) {
     var currX = ($('.sprite').position().left - SPRITE_CENTER_X).toString();
     var currY = (SPRITE_CENTER_Y - $('.sprite').position().top).toString();
     var currAngle = (getRotationDegrees($('#feedbackArea .sprite'))).toString();
-    var currSprite = $('#feedbackArea .sprite').attr('src').substr(9, 1);
-    var currBg = $('#feedbackArea .bg-image').attr('src').substr(8, 1);
+    var currSprite = parseInt($('#feedbackArea .sprite').attr('src').substr(9, 1));
+    if(currSprite==0)
+        currSprite = 8;
+    var currBg = parseInt($('#feedbackArea .bg-image').attr('src').substr(8, 1));
+    if(currBg==0)
+        currBg = 6;
     var canvasHeight = SPRITE_MAX_Y.toString();
     var canvasWidth = SPRITE_MAX_X.toString();
     var mouseX = ((mousePosition.x - $('#feedbackArea').position().left) - SPRITE_CENTER_X).toString();
@@ -275,6 +295,7 @@ var evalExpression = function(expression) {
  *********************/
 var startCommandExecution = function(commands) {
     commands['executeNext'] = function(idx, removeChild) {
+
         removeChild = typeof removeChild !== 'undefined' ? removeChild : false;
 
         if (removeChild) {
@@ -286,11 +307,13 @@ var startCommandExecution = function(commands) {
         } else if (commands.length === 0) {
             shouldStopExecution = false;
             $('#playButton').removeClass('unclickable');
+            $('.current-command').removeClass('current-command');
             console.log('Done with execution');
             return;
         } else {
             shouldStopExecution = false;
             $('#playButton').removeClass('unclickable');
+            $('.current-command').removeClass('current-command');
             console.log('Done with execution');
             return;
         }
@@ -326,7 +349,10 @@ var commandExecutor = function(command, nextCommandFn, idx) {
 
     var commandHandler = commandFactory[commandName];
     if (commandHandler) {
-        commandHandler(command, nextCommandFn, idx);
+        $('.current-command').removeClass('current-command');
+        $('#' + command['commandId']).addClass('current-command');
+        commandHandler(command, nextCommandFn, idx); 
+
     } else {
         console.log('Not implemented');
     }
@@ -339,7 +365,7 @@ var commandExecutor = function(command, nextCommandFn, idx) {
 
         $(".sprite").animate({
             left: x
-        }, function() {
+        },animationDuration, function() {
             nextCommandFn(idx + 1);
         });
     }
@@ -353,19 +379,19 @@ var commandExecutor = function(command, nextCommandFn, idx) {
 
         $(".sprite").animate({
             top: x
-        }, function() {
+        },animationDuration, function() {
             nextCommandFn(idx + 1);
         });
     }
 
     function show(command, nextCommandFn, idx) {
-        $(".sprite").fadeTo("fast", 1, function() {
+        $(".sprite").fadeTo(animationDuration, 1, function() {
             nextCommandFn(idx + 1);
         });
     }
 
     function hide(command, nextCommandFn, idx) {
-        $(".sprite").fadeTo("fast", 0, function() {
+        $(".sprite").fadeTo(animationDuration, 0, function() {
             nextCommandFn(idx + 1);
         });
     }
@@ -388,7 +414,7 @@ var commandExecutor = function(command, nextCommandFn, idx) {
         $(".sprite").animate({
             left: nextX,
             top: nextY
-        }, function() {
+        },animationDuration, function() {
             nextCommandFn(idx + 1);
         });
     }
@@ -401,7 +427,7 @@ var commandExecutor = function(command, nextCommandFn, idx) {
         var sprite = $('.sprite');
         sprite.css('display', 'hidden');
         sprite.attr('src', imagePath);
-        sprite.fadeTo('fast', 1, function() {
+        sprite.fadeTo(animationDuration, 1, function() {
             nextCommandFn(idx + 1);
         });
     }
@@ -413,15 +439,17 @@ var commandExecutor = function(command, nextCommandFn, idx) {
         var imagePath = '/img/bg_' + id + '.jpg';
         currBg.css('display', 'hidden');
         currBg.attr('src', imagePath);
-        currBg.fadeTo("fast", 1, function() {
+        currBg.fadeTo(animationDuration, 1, function() {
             nextCommandFn(idx + 1);
         });
     }
 
     function repeat(command, nextCommandFn, idx) {
+
         var repeatTimes = evalExpression(command['iterations']) | 0;
         var repeatedTimesSoFar = 0;
         command['commands-1']['executeNext'] = function(repeatIdx, removeChild) {
+ 
             removeChild = typeof removeChild !== 'undefined' ? removeChild : false;
 
             if (removeChild) {
@@ -449,14 +477,17 @@ var commandExecutor = function(command, nextCommandFn, idx) {
             }
         };
         if (command['commands-1'].length > 0 && repeatTimes > 0) {
+            
             commandExecutor(command['commands-1'][0], command['commands-1']['executeNext'], 0);
         } else {
+            
             nextCommandFn(idx, true);
         }
     }
 
     function forever(command, nextCommandFn, idx) {
         command['commands-1']['executeNext'] = function(repeatIdx, removeChild) {
+
             removeChild = typeof removeChild !== 'undefined' ? removeChild : false;
 
             if (removeChild) {
@@ -477,8 +508,10 @@ var commandExecutor = function(command, nextCommandFn, idx) {
             }
         };
         if (command['commands-1'].length > 0) {
+            
             commandExecutor(command['commands-1'][0], command['commands-1']['executeNext'], 0);
         } else {
+            
             nextCommandFn(idx, true);
         }
     }
@@ -488,6 +521,7 @@ var commandExecutor = function(command, nextCommandFn, idx) {
         var condition = (typeof rawResult === 'boolean' && rawResult) || false;
         var branchToTake = condition ? 'commands-1' : 'commands-2';
         command[branchToTake]['executeNext'] = function(ifElseIdx, removeChild) {
+
             removeChild = typeof removeChild !== 'undefined' ? removeChild : false;
 
             if (removeChild) {
@@ -495,17 +529,22 @@ var commandExecutor = function(command, nextCommandFn, idx) {
             }
 
             if (command[branchToTake].length === 0) {
+                
                 nextCommandFn(idx, true);
             }
             if (ifElseIdx < command[branchToTake].length && !shouldStopExecution) {
+                
                 commandExecutor(command[branchToTake][ifElseIdx], command[branchToTake]['executeNext'], ifElseIdx);
             } else {
+                
                 nextCommandFn(idx + 1);
             }
         };
         if (command[branchToTake].length > 0) {
+            
             commandExecutor(command[branchToTake][0], command[branchToTake]['executeNext'], 0);
         } else {
+            
             nextCommandFn(idx, true);
         }
     }
@@ -526,7 +565,7 @@ var commandExecutor = function(command, nextCommandFn, idx) {
         var rotateStr = 'rotate(' + rotateDegree + 'deg)';
         $('.sprite').css('-webkit-transform', rotateStr).css('-moz-transform', rotateStr).css('-ms-transform',
             rotateStr).css('-o-transform', rotateStr).css('transform', rotateStr);
-        $('.sprite').fadeTo('fast', 1, function() {
+        $('.sprite').fadeTo(animationDuration, 1, function() {
             nextCommandFn(idx + 1);
         });
     }
@@ -536,7 +575,7 @@ var commandExecutor = function(command, nextCommandFn, idx) {
         var rotateStr = 'rotate(' + rotateDegree + 'deg)';
         $('.sprite').css('-webkit-transform', rotateStr).css('-moz-transform', rotateStr).css('-ms-transform',
             rotateStr).css('-o-transform', rotateStr).css('transform', rotateStr);
-        $('.sprite').fadeTo('fast', 1, function() {
+        $('.sprite').fadeTo(animationDuration, 1, function() {
             nextCommandFn(idx + 1);
         });
     }
@@ -545,6 +584,7 @@ var commandExecutor = function(command, nextCommandFn, idx) {
         var rawResult = evalExpression(command['condition']);
         var condition = (typeof rawResult === 'boolean' && rawResult) || false;
         command['commands-1']['executeNext'] = function (repeatIdx, removeChild) {
+
             removeChild = typeof removeChild !== 'undefined' ? removeChild : false;
 
             if (removeChild) {
@@ -562,15 +602,17 @@ var commandExecutor = function(command, nextCommandFn, idx) {
             condition = (typeof rawResult === 'boolean' && rawResult) || false;
             if (repeatIdx < command['commands-1'].length) {
                 commandExecutor(command['commands-1'][repeatIdx], command['commands-1']['executeNext'], repeatIdx);
-            } else if (condition) {
+            } else if (condition) {                 
                 commandExecutor(command['commands-1'][0], command['commands-1']['executeNext'], 0);
             } else {
                 nextCommandFn(idx + 1);
             }
         };
         if (command['commands-1'].length > 0 && condition) {
+            
             commandExecutor(command['commands-1'][0], command['commands-1']['executeNext'], 0);
         } else {
+            
             nextCommandFn(idx, true);
         }
     }
@@ -606,7 +648,7 @@ $(function() {
 
             function loadCommands(commands, container) {
                 for (var i = 0; i < commands.length; i++) {
-                    var listElem = $('<li>').addClass('ui-state-default command-container');
+                    var listElem = $('<li>').addClass('ui-state-default command-container').attr('id', 'command-' + (++commandId));
                     var commandElem = $('<div>').addClass('command');
                     loadFromFactory[commands[i]['title']](commands[i], commandElem)
                     listElem.append(commandElem);
@@ -621,7 +663,7 @@ $(function() {
                 commandElem.append(commandName);
 
                 $.each(command, function(k, v) {
-                    if (k != 'title') {
+                    if (k != 'title' && k!= 'commandId') {
                         var paramElem = $('<input>').attr('type', 'text').addClass('param').attr('name', k).attr('value', v);
                         removeCommand.after(paramElem);
                     }
@@ -654,7 +696,7 @@ $(function() {
 
                 $.each(command, function(k, v) {
                     // if this param does not start with 'commands', 'id' or 'title'
-                    if (k.indexOf('commands') != 0 && k.indexOf('id') != 0 && k.indexOf('title') != 0) {
+                    if (k.indexOf('commands') != 0 && k.indexOf('id') != 0 && k.indexOf('title') != 0 && k.indexOf('commandId') != 0) {
                         var paramElem = $('<input>').attr('type', 'text').addClass('param').attr('name', k).attr('value', v);
 
                         paramElem.autocomplete({
@@ -795,6 +837,7 @@ var getSequenceJson = function() {
         params.each(function() {
             command[$(this).attr('name')] = $(this).val();
         });
+        command['commandId'] = $(elem).attr('id');
 
         // add the nested blocks if they exist
         for (var i = 1; ; i++) {
@@ -826,8 +869,9 @@ var sortableReceiveHandle = function(e, ui) {
 };
 
 var sortableUpdateHandle = function(e, ui) {
-    $(ui.item).removeClass('template-command-container').removeClass('wide').addClass('command-container').attr('style', '')
-        .find(".remove-command").removeClass('hide');
+    $(ui.item).removeClass('template-command-container').removeClass('wide').addClass('command-container')
+    .attr('style', '').attr('id',  'command-' + (++commandId))
+    .find(".remove-command").removeClass('hide');
 
     $(ui.item).find('.repeat-list').removeClass('hide');
     $(ui.item).find('.connected-sortable').sortable({
