@@ -204,3 +204,13 @@
   max-height: 150px;
   overflow: auto;
 }
+
+.current-command {
+  background-color: #adcef4;
+}
+
+#speed-control{
+  width: 100px;
+  position: relative;
+  top: 20px;
+}
