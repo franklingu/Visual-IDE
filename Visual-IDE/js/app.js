@@ -400,8 +400,8 @@ var commandExecutor = function(command, nextCommandFn, idx) {
     }
 
     function move(command, nextCommandFn, idx) {
-        var currX = $('#feedbackArea .sprite').position().left;
-        var currY = $('#feedbackArea .sprite').position().top;
+        var currX = parseFloat($('#feedbackArea .sprite').css('left'));
+        var currY = parseFloat($('#feedbackArea .sprite').css('top'));
         var moveAmt = evalExpression(command['amount']) | 0;
         var currAngle = 0 - getRotationDegrees($('#feedbackArea .sprite'));
         var moveXAmt = (math.eval('cos(' + currAngle + ' deg)') * moveAmt);
